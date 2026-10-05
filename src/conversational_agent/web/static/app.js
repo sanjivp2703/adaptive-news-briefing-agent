@@ -1,4 +1,4 @@
-/* News Agent — browser app.
+/* Adaptive News Briefing Agent — browser app.
 
    A view over the same system the CLI drives. Two surfaces, as in the CLI:
    the reader pages (Today, Groups) never show a band, a score, or what a
@@ -371,7 +371,7 @@ function railNode() {
   const nodes = [
     h('a', { class: 'brand', href: '#/' },
       h('span', { class: 'brand-mark' }, svgMark()),
-      h('span', { class: 'brand-name' }, 'News Agent')),
+      h('span', { class: 'brand-name' }, 'Adaptive News Briefing Agent')),
     h('nav', { class: 'nav', 'aria-label': 'Main' },
       link('#/', 'Today', r === 'today', totalNew ? h('span', { class: 'count', title: 'Things not yet shown to you' }, totalNew) : null),
       link('#/groups', 'Groups', r === 'groups' || r === 'group'),
@@ -1144,7 +1144,7 @@ function paint() {
   else node = todayNode();
   $view.replaceChildren(node);
   const titles = { today: 'Today', groups: 'Groups', group: (S.page.group && S.page.group.name) || 'Group', console: 'Console' };
-  document.title = `${titles[S.route.name] || 'Today'} · News Agent`;
+  document.title = `${titles[S.route.name] || 'Today'} · Adaptive News Briefing Agent`;
 
   if (keep) {
     const el = document.querySelector(`[data-keep="${keep}"]`);

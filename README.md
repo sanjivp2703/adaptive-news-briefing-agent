@@ -1,4 +1,4 @@
-# In the Loop
+# Adaptive News Briefing Agent
 
 **An AI agent that keeps you conversant with the groups you care about.**
 
@@ -26,7 +26,7 @@ that runs locally in one command, with no API key and no dependencies beyond
 Python 3.11:
 
 ```bash
-git clone https://github.com/sanjivp2703/in-the-loop-agent.git && cd in-the-loop-agent
+git clone https://github.com/sanjivp2703/adaptive-news-briefing-agent.git && cd adaptive-news-briefing-agent
 PYTHONPATH=src python3 -m conversational_agent.web --demo --open
 ```
 

@@ -88,7 +88,7 @@ h1, h2, h3, p { margin: 0; }
   display: grid; place-items: center; flex: none;
 }
 .brand-mark svg { width: 16px; height: 16px; }
-.brand-name { font: 600 17px/1 var(--serif); letter-spacing: -.01em; }
+.brand-name { font: 600 16px/1.15 var(--serif); letter-spacing: -.01em; min-width: 0; }
 
 .nav { display: flex; flex-direction: column; gap: 2px; }
 .nav a {

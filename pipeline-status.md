@@ -1,4 +1,4 @@
-# Pipeline status — news_agent (Conversational Competence Agent)
+# Pipeline status — Adaptive News Briefing Agent (news_agent)
 
 Build state per feature slice. The project was specified first
 (`docs/spec.md`), decomposed into slices, built, then put through repeated

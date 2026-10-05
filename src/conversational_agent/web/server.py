@@ -695,7 +695,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Could not start on {args.host}:{args.port}: {exc}", file=sys.stderr)
         return 1
     url = f"http://{'127.0.0.1' if args.host in ('0.0.0.0', '::') else args.host}:{args.port}"
-    print(f"News agent running at {url}")
+    print(f"Adaptive News Briefing Agent running at {url}")
     print(f"  store        {app.resolved_db_path()}")
     if app.demo:
         print("  mode         DEMO: a recorded session, no API key needed, no live calls")
