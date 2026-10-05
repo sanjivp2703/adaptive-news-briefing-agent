@@ -253,9 +253,11 @@ numbers recorded before and after each change. All four charts are drawn from
 
 ![Materiality precision, recall and F1 across checkpoints 1, 2 and 5](docs/charts/materiality-by-checkpoint.svg)
 
-Precision held at 0.97 throughout. Recall rose from 0.83 to 0.94 at
-checkpoint 2, when term canonicalisation and a revised evidence prompt stopped
-the ledger from fragmenting, and held there at checkpoint 5.
+Precision held at 0.97 throughout. Recall was 0.83 on the first run and
+0.94 on every run after. The materiality prompt did not change between
+checkpoints 1 and 2, so the decision log records that jump as run-to-run
+variation or label noise, not as an improvement; the point of the chart is
+that the judgment held steady while everything around it was rebuilt.
 
 ![Ledger errors before and after checkpoint 2](docs/charts/ledger-before-after.svg)
 
