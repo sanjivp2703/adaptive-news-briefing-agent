@@ -65,7 +65,7 @@ def materiality_chart() -> str:
         body.append(f'<line x1="{left}" x2="{right}" y1="{sy(v):.1f}" y2="{sy(v):.1f}" stroke="{GRID}"/>')
         body.append(text(left - 8, sy(v) + 4, f"{v:.1f}", fill=INK2, anchor="end", size=11))
     series = [("Precision", "precision"), ("Recall", "recall"), ("F1", "f1")]
-    for k, (name, key) in enumerate(series):
+    for k, (_, key) in enumerate(series):
         color = SERIES[k]
         d = " ".join(f"{'M' if i == 0 else 'L'}{sx(i):.1f},{sy(p[key]):.1f}" for i, p in enumerate(pts))
         body.append(f'<path d="{d}" fill="none" stroke="{color}" stroke-width="2" stroke-linejoin="round"/>')
