@@ -226,24 +226,65 @@ known:
 The offline mode stubs the model and the event feed and is byte-reproducible.
 It checks structure, not judgment: a stub has none.
 
-**Measured so far** (five hand-built personas, eight rounds each, live, 318
-model calls, about $3; details in [docs/checkpoints.md](docs/checkpoints.md)):
+### The evaluation sets
 
-| Measure | Result |
-|---|---|
-| Materiality vs. labelled real events | precision 0.97, recall 0.94, F1 0.96 |
-| Stories repeated | 0 of 34 briefings |
-| Ledger precision, `unknown` | 22 / 23 |
-| Ledger precision, `confirmed` | 6 / 8 |
-| Ledger precision, `familiar` after one read | 2 / 32 |
+Everything below is checked in under `harness/personas/`, except the
+calibration corpora, which are third-party and fetched by script.
 
-The last row is reported because it is the weakest: a term glossed once in a
-skimmed briefing is usually still unknown. That state stops re-glossing but is
-excluded from the proficiency band until a second read, which is the design
-responding to the measurement.
+| Set | What it is | Size | Used for |
+|---|---|---|---|
+| Hand-built personas | Five simulated readers over three groups: a startup operator and a newcomer to startup funding, a wine-trade professional and a barely-following wine reader, and a Premier League follower. Each has a concept set with ground truth, a reply style, and a reading profile. | 5 personas, 8 real events each | Every live run; all headline numbers |
+| Generated personas | Four archetypes per group (beginner, partial, expert, expert in one subdomain) over Premier League, NFL, crypto and AI trends, drafted by a model and validated by code. | 16 personas, 29 events | Offline runs; no scored live run yet |
+| Real events | News from August to September 2026, each verified against its source page and labelled major, borderline or minor. | 40 hand-built, 29 generated | Materiality ground truth; briefing subjects |
+| Materiality labels | The author's material / not-material label on each event a run judged. | about 40 per five-persona run | Precision, recall, F1 |
+| Hidden probe | After a session, each persona is asked about every term outside the system's view and graded 0 to 3. | one probe per term per session | Ledger precision and recall |
+| WildChat-1M | Real human-to-assistant conversations, filtered to turns that follow an informational reply; 80 hand-classified. | 8,000 conversations, 507 turns | Persona register: how often they ask, extend, check a belief or stay silent |
+| Hacker News | Comment threads on the same topics. | 1,286 comments | Reply-length distribution only |
+| Distillation set | Briefings written by Claude for synthetic reader states over the real events. | 500 generated, 452 pass checks | Training the local model (held out: 45) |
 
-The numbers are small-sample and the materiality labels are the author's own.
-They are evidence the pieces work, not a benchmark.
+### Measured progress
+
+The model has not been fine-tuned yet, so there is no training curve. What
+there is: five live evaluation checkpoints in which the prompts and the
+knowledge model were revised against the same personas and events, with the
+numbers recorded before and after each change. All four charts are drawn from
+[docs/charts/data.json](docs/charts/data.json), which cites its sources, by
+[docs/charts/make_charts.py](docs/charts/make_charts.py).
+
+![Materiality precision, recall and F1 across checkpoints 1, 2 and 5](docs/charts/materiality-by-checkpoint.svg)
+
+Precision held at 0.97 throughout. Recall rose from 0.83 to 0.94 at
+checkpoint 2, when term canonicalisation and a revised evidence prompt stopped
+the ledger from fragmenting, and held there at checkpoint 5.
+
+![Ledger errors before and after checkpoint 2](docs/charts/ledger-before-after.svg)
+
+The same checkpoint halved spurious "understood" credits and ledger false
+positives, and removed every false claim about the persona who never speaks.
+That persona exists to catch exactly this: any term it is credited with is
+wrong by construction.
+
+![Ledger precision by state at checkpoint 5](docs/charts/ledger-precision-by-state.svg)
+
+Checkpoint 5 was the first complete five-persona run on the corrected
+system: 34 briefings, 34 distinct events, zero repeats, where the run before
+had told one persona the same story five times. The chart shows what the
+ledger gets right by state. The weakest row is reported on purpose: a term
+glossed once in a skimmed briefing is usually still unknown, which is why
+that state is excluded from the proficiency band until a second read.
+
+![Briefing depth by reader profile in the teacher data](docs/charts/briefing-depth-by-profile.svg)
+
+The last chart is about the training data rather than a checkpoint. It shows
+that the briefing prompt, given the same events, writes measurably simpler
+prose with more definitions for a beginner and denser prose with almost none
+for an expert. That adaptation is what the local model is being trained to
+reproduce.
+
+**Caveats.** The samples are small, the materiality labels are the author's
+own, and no live run has yet passed the harness's ledger gate (precision 0.75
+and recall 0.70 against each persona's real knowledge). These are evidence the
+pieces work and that each revision helped, not a benchmark.
 
 ## Model training track
 

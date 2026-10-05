@@ -1,0 +1,128 @@
+{
+ "_about": "Numbers behind docs/charts/*.svg. Sources: docs/checkpoints.md (checkpoints 1, 2 and 5) and training/data/sft_generated.clean.jsonl (452 teacher briefings under briefing prompt v7). Regenerate the SVGs with `python docs/charts/make_charts.py`.",
+ "materiality_by_checkpoint": [
+  {
+   "checkpoint": "CP1",
+   "date": "2026-09-08",
+   "label": [
+    "first live run"
+   ],
+   "precision": 0.97,
+   "recall": 0.83,
+   "f1": 0.89
+  },
+  {
+   "checkpoint": "CP2",
+   "date": "2026-09-08",
+   "label": [
+    "term canonicalisation,",
+    "concept_evidence v3"
+   ],
+   "precision": 0.97,
+   "recall": 0.94,
+   "f1": 0.96
+  },
+  {
+   "checkpoint": "CP5",
+   "date": "2026-09-13",
+   "label": [
+    "never-repeat rule,",
+    "familiar state, 5 personas"
+   ],
+   "precision": 0.97,
+   "recall": 0.94,
+   "f1": 0.96
+  }
+ ],
+ "ledger_before_after_cp2": [
+  {
+   "measure": "Spurious 'understood' credits",
+   "before": 42,
+   "after": 22
+  },
+  {
+   "measure": "Ledger false positives, all personas",
+   "before": 35,
+   "after": 17
+  },
+  {
+   "measure": "False claims about the silent persona",
+   "before": 2,
+   "after": 0
+  }
+ ],
+ "ledger_precision_by_state_cp5": [
+  {
+   "state": "unknown",
+   "correct": 22,
+   "n": 23
+  },
+  {
+   "state": "confirmed",
+   "correct": 6,
+   "n": 8
+  },
+  {
+   "state": "explained, 2+ reads",
+   "correct": 2,
+   "n": 3
+  },
+  {
+   "state": "familiar, 2+ reads",
+   "correct": 2,
+   "n": 3
+  },
+  {
+   "state": "explained, 1 read",
+   "correct": 2,
+   "n": 8
+  },
+  {
+   "state": "provisional",
+   "correct": 2,
+   "n": 9
+  },
+  {
+   "state": "familiar, 1 read",
+   "correct": 2,
+   "n": 32
+  }
+ ],
+ "repetition": {
+  "cp4_same_story_told_to_one_persona": 5,
+  "cp5_briefings": 34,
+  "cp5_distinct_events": 34
+ },
+ "briefing_depth_by_reader_profile_v7": {
+  "beginner": {
+   "n": 88,
+   "fk_grade_mean": 10.04,
+   "definitions_per_100w_mean": 1.57,
+   "domain_term_density_mean": 0.82
+  },
+  "partial": {
+   "n": 96,
+   "fk_grade_mean": 12.07,
+   "definitions_per_100w_mean": 1.17,
+   "domain_term_density_mean": 1.86
+  },
+  "expert_one_subdomain": {
+   "n": 90,
+   "fk_grade_mean": 12.0,
+   "definitions_per_100w_mean": 1.15,
+   "domain_term_density_mean": 1.67
+  },
+  "expert": {
+   "n": 85,
+   "fk_grade_mean": 12.8,
+   "definitions_per_100w_mean": 0.47,
+   "domain_term_density_mean": 2.06
+  },
+  "returning_reader": {
+   "n": 93,
+   "fk_grade_mean": 12.68,
+   "definitions_per_100w_mean": 0.67,
+   "domain_term_density_mean": 2.1
+  }
+ }
+}
