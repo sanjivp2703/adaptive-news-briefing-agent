@@ -1,0 +1,185 @@
+{
+  "group": {
+    "slug": "nfl",
+    "name": "NFL",
+    "description": "American football's NFL: results, injuries, trades, coaching changes and the start of the 2026 season.",
+    "poll_interval_minutes": 240
+  },
+  "generated_at": "2026-09-14T16:00:34+00:00",
+  "run_id": "persona_gen_20260914T154815Z",
+  "window": {
+    "start": "2026-08-01",
+    "end": "2026-09-13"
+  },
+  "passes": [
+    {
+      "pass": 1,
+      "method": "directed_search",
+      "candidates_from_search": 12,
+      "candidates": 10,
+      "excluded_by_source_selection": 2,
+      "note": "Dropped the Fox Sports 'offseason buzz/rumors' evergreen page (DJ Moore injury) and the generic nfl.com/news landing page (A.J. Brown injury) — both are rotating index pages rather than a verifiable dated report."
+    },
+    {
+      "pass": 2,
+      "method": "directed_search",
+      "candidates_from_search": 12,
+      "candidates": 10,
+      "excluded_by_source_selection": 2,
+      "note": "Two FantasyPros items came from the same undated, continuously-updated evergreen injury-report page and described only 'questionable'/ongoing statuses rather than discrete developments."
+    }
+  ],
+  "rejected": [
+    {
+      "headline": "Seahawks beat Patriots 29-13 in 2026 Kickoff Game",
+      "url": "https://www.nfl.com/news/patriots-vs-seahawks-five-must-know-storylines-for-wednesday-s-2026-nfl-kickoff-game",
+      "reason": "page does not support the event: The page is a pre-game preview article listing storylines to watch for Wednesday's kickoff game; the 29-13 score referenced is from the prior Super Bowl LX matchup, not a reported result of the 2026 season opener, so the candidate's claim about the kickoff game result is not supported by this page."
+    },
+    {
+      "headline": "Seahawks rookie safety Bud Clark breaks ankle in preseason",
+      "url": "https://www.cbssports.com/nfl/news/nfl-training-camp-injury-tracker/",
+      "reason": "duplicate URL"
+    },
+    {
+      "headline": "Panthers acquire DT TeRah Edwards from the Chargers",
+      "url": "https://www.espn.com/nfl/story/_/id/48915793/2026-nfl-offseason-trade-tracker-updates-news-contracts-training-camp-preseason",
+      "reason": "verification incomplete after retry: occurred_at must be YYYY-MM-DD; none was established"
+    },
+    {
+      "headline": "Myles Garrett to have knee surgery and go on injured reserve",
+      "url": "https://www.espn.com/nfl/story/_/id/49928065/sources-rams-myles-garrett-knee-surgery-headed-ir",
+      "reason": "page unreadable (thin or non-2xx body) and search fallback found no copy"
+    }
+  ],
+  "events": [
+    {
+      "headline": "Panthers beat Cardinals 33-30 in 2026 Hall of Fame Game in Canton, Ohio.",
+      "detail": "Third-string rookie quarterback Haynes King entered late and threw for 180 yards and two touchdowns, plus a game-winning 5-yard touchdown run with no time left. Starter Kenny Pickett also played, leading an early touchdown drive. The game was Carolina's 33-30 preseason-opening win over Arizona at Tom Benson Hall of Fame Stadium.",
+      "source_name": "NFL.com",
+      "source_url": "https://www.nfl.com/news/panthers-cardinals-2026-hall-of-fame-game-what-we-learned-from-carolina-s-33-30-win",
+      "occurred_at": "2026-08-07",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 85,
+      "verify_reasoning": "The page confirms the 33-30 Panthers win over the Cardinals in the Hall of Fame Game with King's game-winning TD, though it does not state King is undrafted, so that detail is omitted.",
+      "discovered_by": "directed_search",
+      "should_be_material": false,
+      "materiality_score": 33.0,
+      "materiality_reasoning": "The Hall of Fame Game is a notable calendar marker (football is back) but its result is preseason exhibition noise — third-string QBs and a final score no one references a week later. A general NFL follower would know the preseason had started, but not knowing that Carolina beat Arizona 33-30 or that Haynes King scored late costs nothing socially. It would score higher if the game produced a significant injury, a starter controversy, or involved a marquee storyline rather than a third-string rookie.",
+      "significance": "minor"
+    },
+    {
+      "headline": "Commanders LT Laremy Tunsil tears triceps in practice, could miss most of 2026 season",
+      "detail": "Tunsil suffered a torn triceps during Saturday's practice while trying to block a bull rush from Odafe Oweh, per ESPN. The injury will require surgery and could sideline him for most or all of the 2026 season. Tunsil, a five-time Pro Bowler who signed a two-year, $60.2 million extension with Washington five months earlier, started 14 games for the Commanders in 2025.",
+      "source_name": "CBS Sports",
+      "source_url": "https://www.cbssports.com/nfl/news/commanders-laremy-tunsil-torn-triceps-will-miss-most-of-2026-season/",
+      "occurred_at": "2026-08-08",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 70,
+      "verify_reasoning": "The page directly reports Tunsil's torn triceps injury sustained in practice on Saturday, Aug. 8, 2026, with details on surgery need and expected missed time, matching the candidate claim.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 74.0,
+      "materiality_reasoning": "A five-time Pro Bowl left tackle on a $60M extension suffering a season-ending triceps tear in training camp is a major injury story that dominates NFL news cycles and reshapes a team's outlook; it's the kind of item any NFL follower would have seen. It falls short of top-tier (star QB or MVP-caliber player) materiality since offensive linemen draw less general attention, but with no saturating similar events recorded it clearly clears the bar.",
+      "significance": "borderline"
+    },
+    {
+      "headline": "Cardinals rookie OL Chase Bisontis tore his MCL and will miss his entire rookie season.",
+      "detail": "Bisontis, the No. 34 overall pick in the 2026 NFL Draft, injured his knee during the Cardinals' preseason opener on Aug. 14. The Texas A&M product tore his MCL and will miss his entire rookie season. He was viewed as one of the top interior linemen in this year's draft class, having played snaps at both guard and center.",
+      "source_name": "CBS Sports",
+      "source_url": "https://www.cbssports.com/nfl/news/nfl-training-camp-injury-tracker/",
+      "occurred_at": "2026-08-14",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 72,
+      "verify_reasoning": "The page's injury tracker explicitly states Bisontis, the No. 34 pick, tore his MCL in the preseason opener on Aug. 14 and will miss his entire rookie season.",
+      "discovered_by": "directed_search",
+      "should_be_material": false,
+      "materiality_score": 42.0,
+      "materiality_reasoning": "A season-ending injury to a second-round interior lineman is real news for Cardinals fans, draft followers and fantasy/dynasty players, but offensive line rookies rarely register in general NFL conversation. No competing recent events to saturate or escalate against, which nudges it up slightly, but not enough — a broadly conversant NFL fan could easily miss this without looking out of the loop. A starting quarterback, a first-round skill player, or a playoff-team cornerstone would have changed the answer.",
+      "significance": "borderline"
+    },
+    {
+      "headline": "NFL eliminates the Pro Bowl game, will name an 88-player Pro Bowl team instead",
+      "detail": "The NFL has scrapped the Pro Bowl event entirely, replacing it with the naming of an 88-player Pro Bowl team with no game or competitive events. Players will instead be invited to Los Angeles for an in-person celebration in February, likely during Super Bowl week. NFL executive VP Peter O'Reilly said the change shifts focus from the game to honoring the season's best players, noting the switch from tackle to flag football four years earlier hadn't solved declining player participation. The NFL had held a Pro Bowl in some form every year since 1951.",
+      "source_name": "NBC Sports (ProFootballTalk)",
+      "source_url": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/nfl-ditches-the-pro-bowl",
+      "occurred_at": "2026-08-26",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 78,
+      "verify_reasoning": "The page directly reports, via Mike Florio citing Jonathan Jones of The Athletic, that the NFL has ended the Pro Bowl game/skills competition in favor of naming an 88-player Pro Bowl team, matching the candidate's claim with published date August 26, 2026.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 80.0,
+      "materiality_reasoning": "The permanent elimination of a 75-year-old NFL institution is a league-wide structural change that drew broad national coverage and sustained debate about all-star honors and player participation. For a general NFL-following group, not knowing the Pro Bowl game no longer exists would be a visible gap, even though it's an administrative rather than on-field item. A narrower fantasy- or results-focused group would lower this somewhat, but the group description covers the league broadly.",
+      "significance": "major"
+    },
+    {
+      "headline": "NFL teams cut rosters to 53 players, releasing 1,184 players by Sunday 6 p.m. ET deadline",
+      "detail": "For the first time in 22 years, the NFL held final roster cuts on a Sunday, with teams required to trim from 90 to 53 players by the 6 p.m. ET deadline. A total of 1,184 players were released over the weekend, including Titans quarterback Will Levis. Players with four or fewer years of experience will hit the waiver wire, with claims due Monday at 1 p.m. ET.",
+      "source_name": "CBS Sports",
+      "source_url": "https://www.cbssports.com/nfl/news/2026-nfl-roster-cuts-tracker-live-updates-latest-moves-trade-rumors-as-all-32-teams-finalize-53-man-rosters/live/",
+      "occurred_at": "2026-08-30",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 80,
+      "verify_reasoning": "The page directly reports the 1,184 player cutdown to 53-man rosters by the Sunday 6 p.m. ET deadline, including the release of Titans QB Will Levis, matching the candidate.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 72.0,
+      "materiality_reasoning": "Final roster cutdown day is one of the biggest fixed points on the NFL calendar — over a thousand transactions in 48 hours, plus notable names like Will Levis being released — and it's the immediate precursor to Week 1, so it will dominate NFL conversation. It loses some points for being a predictable annual ritual rather than a surprise, but the specific casualties and the unusual Sunday deadline are things any conversant fan would have absorbed. Had this been a single routine cut rather than the league-wide deadline, I'd have scored it far lower.",
+      "significance": "borderline"
+    },
+    {
+      "headline": "Aaron Donald comes out of retirement to sign a one-year deal with the Rams for the 2026 season",
+      "detail": "Three-time Defensive Player of the Year Aaron Donald, 35, signed a one-year, $20 million deal with the Los Angeles Rams that includes incentives worth up to $30 million, according to an ESPN report. He last played in the NFL in 2023 and will join fellow former DPOY Myles Garrett on the Rams' defensive front. The move was announced by the team on August 30, 2026.",
+      "source_name": "CBS Sports",
+      "source_url": "https://www.cbssports.com/nfl/news/aaron-donald-unretires-returns-to-rams-for-2026-season/",
+      "occurred_at": "2026-08-30",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 55,
+      "verify_reasoning": "The page confirms Aaron Donald unretired and signed a one-year, $20 million deal (with incentives up to $30M) with the Rams, announced Aug. 30, 2026, matching the candidate's details.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 92.0,
+      "materiality_reasoning": "A first-ballot Hall of Fame talent and three-time DPOY unretiring days before the season opener, on a $20M deal joining another DPOY on the same defensive line, is exactly the kind of blockbuster that dominates NFL conversation for weeks. No recent events dilute it, and it's novel rather than routine roster churn. Only a fabricated or misreported premise would change the verdict.",
+      "significance": "major"
+    },
+    {
+      "headline": "Seahawks beat Patriots 13-10 in NFL 2026 season opener rematch of Super Bowl LX",
+      "detail": "Seattle rallied from a 10-0 deficit, scoring 10 fourth-quarter points to beat New England 13-10 on Wednesday night despite starting quarterback Sam Darnold leaving with a hip injury just five plays in. Backup Drew Lock led the comeback, with Jaxon Smith-Njigba catching a 45-yard touchdown to tie the game. Drake Maye threw three fourth-quarter interceptions for the Patriots, including the game-sealing pick by Josh Jobe in the final minute.",
+      "source_name": "Yahoo Sports",
+      "source_url": "https://sports.yahoo.com/nfl/live/patriots-vs-seahawks-score-live-updates-highlights-stats-where-to-watch-week-1-season-opener-super-bowl-lx-rematch-222000691.html",
+      "occurred_at": "2026-09-09",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 72,
+      "verify_reasoning": "The page directly reports the game result, final score 13-10, and details of the Super Bowl LX rematch played Wednesday, September 9, 2026.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 87.0,
+      "materiality_reasoning": "This is the NFL season opener and a Super Bowl LX rematch — the single most-watched game of the week — with a marquee storyline (the Super Bowl-winning team's starting QB injured on the fifth play, backup leads comeback, opposing franchise QB throws three fourth-quarter picks). Anyone conversant with the NFL would know the opener's result and the Darnold injury. No recent events are recorded, so there's no saturation discount; only a lower-profile result would have pulled this down.",
+      "significance": "major"
+    },
+    {
+      "headline": "49ers beat Rams 27-7 in NFL's first regular-season game in Australia",
+      "detail": "San Francisco defeated Los Angeles 27-7 at the Melbourne Cricket Ground in the NFL's first-ever regular season game played in Australia. Brock Purdy threw for 205 yards and three touchdowns, connecting with Demarcus Robinson (39 yards), Mike Evans (2 yards), and Deebo Samuel Sr. (15 yards). The 49ers defense held the Rams to just seven points, with LB Fred Warner passing Patrick Willis for the franchise's all-time career tackles record.",
+      "source_name": "49ers.com",
+      "source_url": "https://www.49ers.com/news/49ers-open-2026-with-27-7-win-over-rams-in-melbourne-takeaways-from-larvssf",
+      "occurred_at": "2026-09-10",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 78,
+      "verify_reasoning": "The page directly reports the 27-7 win over the Rams in Melbourne, described as the NFL's first regular-season game in Australia, with detailed game recap and quotes, dated Sep 10, 2026.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 84.0,
+      "materiality_reasoning": "This is a season-opening divisional game and the NFL's first-ever regular-season game in Australia — a historic league milestone that would dominate NFL conversation, plus a lopsided 49ers win and Fred Warner breaking the franchise tackles record. With no saturating recent events recorded, any NFL follower would be expected to know the opening-weekend result and the Melbourne first. Only a much lower-profile game or a redundant prior event would have lowered this.",
+      "significance": "major"
+    }
+  ],
+  "short_of_target": false
+}

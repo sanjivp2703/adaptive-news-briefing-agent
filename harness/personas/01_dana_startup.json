@@ -1,0 +1,233 @@
+{
+  "id": "dana_startup",
+  "display_name": "Dana Okafor",
+  "archetype": "well_informed",
+  "notes": "Well-informed persona in a fast-moving domain. Reads funding news daily, so she carries deal structure and revenue vocabulary; the gaps are on the LP/fund side of the table, which she sees written about but has never had to use. Events are the real, verified August 2026 startup/VC items from research/startup_founders.md, in the order they broke.",
+  "profile": {
+    "bio": "Seed-stage founder, second company. Reads TechCrunch and Crunchbase News every morning, sits on one other cap table as an angel."
+  },
+  "seed": 20260901,
+  "interactions": 8,
+  "learning": {
+    "schema": "v1",
+    "prior_knowledge": 0.85,
+    "memory_rate": 1.0
+  },
+  "group": {
+    "name": "Startups and VC",
+    "description": "Funding rounds, exits and market conditions in venture-backed technology companies.",
+    "poll_interval_minutes": 180,
+    "vocabulary": [
+      "valuation",
+      "acquisition",
+      "arr",
+      "run-rate",
+      "venture funding",
+      "enterprise value",
+      "equity value",
+      "step-up",
+      "assets under management"
+    ],
+    "subdomains": {
+      "funding mechanics": [
+        "venture funding",
+        "funding round",
+        "series a",
+        "series b",
+        "series c",
+        "term sheet",
+        "lead investor"
+      ],
+      "revenue metrics": [
+        "arr",
+        "run-rate",
+        "annualized revenue",
+        "gross margin",
+        "burn rate"
+      ],
+      "valuation & exits": [
+        "valuation",
+        "acquisition",
+        "enterprise value",
+        "ipo",
+        "all-stock deal",
+        "market capitalization"
+      ],
+      "deal accounting": [
+        "equity value",
+        "step-up",
+        "post-money",
+        "pre-money",
+        "net debt",
+        "dilution"
+      ],
+      "fund & lp side": [
+        "assets under management",
+        "limited partner",
+        "management fee",
+        "carried interest",
+        "fund vintage",
+        "dry powder"
+      ],
+      "market conditions": [
+        "deal count",
+        "down round",
+        "flat round",
+        "funding winter",
+        "exit window"
+      ]
+    }
+  },
+  "knows": [
+    "valuation",
+    "acquisition",
+    "arr",
+    "run-rate",
+    "venture funding",
+    "enterprise value"
+  ],
+  "does_not_know": [
+    "equity value",
+    "step-up",
+    "assets under management"
+  ],
+  "familiar_subdomains": {
+    "funding mechanics": 0.95,
+    "revenue metrics": 0.9,
+    "valuation & exits": 0.9,
+    "deal accounting": 0.6,
+    "fund & lp side": 0.3,
+    "market conditions": 0.7
+  },
+  "style": {
+    "median_words": 16,
+    "variance": 1.0,
+    "lowercase": false,
+    "drop_terminal_punct_rate": 0.5,
+    "ask_rate_default": 0.25,
+    "ask_rate_unknown_present": 0.45,
+    "react_rate": 0.08,
+    "continue_rate": 0.35,
+    "max_turns": 3,
+    "clarify_share": 0.5,
+    "check_belief_share": 0.3,
+    "remark_share": 0.5,
+    "context_rate": 0.25,
+    "gap_admit_rate": 0.05,
+    "redirect_rate": 0.1
+  },
+  "events": [
+    {
+      "headline": "SpaceX completed its all-stock, $60 billion acquisition of Anysphere, the company behind the AI coding tool Cursor.",
+      "detail": "The merger agreement was signed in June 2026 and the deal closed in mid-August, with SpaceX confirming completion in a regulatory filing; Cursor said it would gain access to 'the largest fleet of GPUs in the world.' Cursor retained its own name and, unusually for a company closing an acquisition of this size, announced its own acqui-hire of Firetiger the day before closing.",
+      "source_url": "https://techcrunch.com/2026/08/15/spacex-officially-closes-its-cursor-acquisition/",
+      "source_name": "TechCrunch",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "acquisition"
+      ],
+      "occurred_hours_ago": 3.0
+    },
+    {
+      "headline": "Databricks raised $5 billion at a $190 billion valuation, led by Coatue, after originally planning to raise only $1 billion.",
+      "detail": "CEO Ali Ghodsi said the company set out to raise $1 billion, but press coverage of the raise triggered roughly $15 billion of inbound investor interest, and Databricks issued more stock than planned rather than turn existing backers away. The company disclosed a $7 billion annualized revenue run-rate growing more than 80% year over year, with the core cloud data warehouse product at $1.5 billion and Lakebase at $100 million.",
+      "source_url": "https://techcrunch.com/2026/08/13/databricks-wanted-to-raise-1b-investors-wanted-15b-it-settled-on-5b-at-a-190b-valuation/",
+      "source_name": "TechCrunch",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "valuation",
+        "run-rate"
+      ],
+      "occurred_hours_ago": 2.0
+    },
+    {
+      "headline": "Global venture funding reached $42 billion across just over 1,500 startups in August 2026, down 25% from July but up 122% from August 2025.",
+      "detail": "Seven companies raised billion-dollar rounds during the month, tying for the second-highest monthly count of 2026 behind July's 13. The largest disclosed round was Databricks at $5 billion and a $190 billion valuation, followed by defense-tech company Hadrian, custom AI fine-tuning startup River AI, low-orbit satellite operator Yuanxin Satellite, nuclear energy company Valar Atomics, automated-coding startup Poolside, and home-battery company Base Power.",
+      "source_url": "https://news.crunchbase.com/venture/global-funding-billion-dollar-deals-august-2026/",
+      "source_name": "Crunchbase News",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "venture funding",
+        "valuation"
+      ],
+      "occurred_hours_ago": 2.5
+    },
+    {
+      "headline": "Bloomberg reported that Stripe was nearing a deal to acquire AI model-routing startup OpenRouter for more than $7 billion; Stripe declined to comment and neither company confirmed it.",
+      "detail": "OpenRouter provides a single access point through which customers can select among different AI models by need and budget, avoiding vendor lock-in; it had raised a $113 million Series B in May 2026 at a $1.3 billion valuation, making the reported price roughly a 5x step-up in about three months. A Stripe spokesperson told TechCrunch the company does not comment on rumors or speculation.",
+      "source_url": "https://techcrunch.com/2026/08/16/stripe-will-reportedly-acquire-ai-gateway-startup-openrouter-for-7b/",
+      "source_name": "TechCrunch",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "valuation",
+        "step-up"
+      ],
+      "occurred_hours_ago": 4.0
+    },
+    {
+      "headline": "Andreessen Horowitz's fifth growth fund was reported at $8.5 billion, up from the $6.75 billion it launched with in January 2026, days after the firm announced a separate $1.1 billion Machine Age Fund for AI hardware.",
+      "detail": "The growth fund launched in January 2026 at $6.75 billion and targets enterprise and consumer AI, defense tech, robotics, infrastructure hardware and software, and health tech. The new Machine Age Fund, announced on August 28, 2026, is aimed at AI hardware startups building chips, memory, networking and storage. a16z's total assets under management were about $90 billion as of January 2026.",
+      "source_url": "https://techcrunch.com/2026/08/31/a16z-brings-growth-fund-to-8-5b-days-after-launching-new-1-1b-fund/",
+      "source_name": "TechCrunch",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "assets under management"
+      ],
+      "occurred_hours_ago": 5.0
+    },
+    {
+      "headline": "Bending Spoons completed its all-cash acquisition of Airtable at a $1.285 billion enterprise value, far below Airtable's 2021 peak valuation of more than $11 billion.",
+      "detail": "The deal was announced in early August at an enterprise value of $1.285 billion, implying roughly $2.25 billion of equity value once Airtable's net cash is counted, against a 2021 peak valuation of more than $11 billion and secondary-market trading around $4 billion earlier in 2026. Airtable's ARR was about $480 million as of June 2026, growing over 20% year over year; the acquisition completed on September 4, 2026 and was Bending Spoons' first since its Nasdaq listing on July 1, 2026.",
+      "source_url": "https://investors.bendingspoons.com/newsroom/bending-spoons-completes-acquisition-of-airtable",
+      "source_name": "Bending Spoons",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "acquisition",
+        "enterprise value",
+        "equity value",
+        "valuation",
+        "arr"
+      ],
+      "occurred_hours_ago": 2.0
+    },
+    {
+      "headline": "Vibe-coding platform Lovable confirmed a $400 million Series C at a $13.3 billion valuation.",
+      "detail": "The round was led by Menlo Ventures and the Scaleup Europe Fund with more than a dozen other investors; Lovable reported roughly $500 million ARR as of June 2026, hosts 60 million projects and cites 900 million monthly visitors, and now trains an in-house model alongside frontier models. The valuation roughly doubled from $6.6 billion in December 2025.",
+      "source_url": "https://techcrunch.com/2026/08/12/lovable-confirms-new-13-3b-valuation-raises-another-400m/",
+      "source_name": "TechCrunch",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "valuation",
+        "arr"
+      ],
+      "occurred_hours_ago": 3.0
+    },
+    {
+      "headline": "Publicly traded Klaviyo acquired AI customer-success startup Agency, with founder Elias Torres becoming Klaviyo's chief product officer.",
+      "detail": "Agency, founded in 2023, had raised $32 million from Sequoia, Menlo Ventures and Felicis and had a 25-person team; terms were not disclosed. Torres previously co-founded Performable (acquired by HubSpot in 2011) and Drift (sold to Vista Equity for $1.2 billion in 2021), and had been an angel investor in Klaviyo's 2015 seed round; Klaviyo CEO Andrew Bialecki hired him at Performable in 2010.",
+      "source_url": "https://techcrunch.com/2026/08/05/klaviyo-acquires-elias-torres-agency-in-full-circle-reunion-for-tech-founders/",
+      "source_name": "TechCrunch",
+      "should_be_material": false,
+      "significance": "minor",
+      "concepts": [],
+      "occurred_hours_ago": 6.0
+    }
+  ],
+  "reading": "skimmer",
+  "quantities": [
+    "arr",
+    "assets under management",
+    "enterprise value",
+    "equity value",
+    "run-rate",
+    "step-up",
+    "valuation"
+  ]
+}

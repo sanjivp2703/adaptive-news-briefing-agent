@@ -1,0 +1,167 @@
+{
+  "group": {
+    "slug": "ai_trends",
+    "name": "AI industry",
+    "description": "Model releases, AI company funding and deals, compute and chips, AI policy.",
+    "poll_interval_minutes": 180
+  },
+  "generated_at": "2026-09-14T16:57:51+00:00",
+  "run_id": "persona_gen_20260914T164359Z",
+  "window": {
+    "start": "2026-08-01",
+    "end": "2026-09-13"
+  },
+  "passes": [
+    {
+      "pass": 1,
+      "method": "directed_search",
+      "candidates_from_search": 12,
+      "candidates": 10,
+      "excluded_by_source_selection": 2,
+      "note": "Excluded the OpenAI 'Hugging Face breach report' item — the snippet is internally confused about what the report covers and is uncorroborated. Excluded the Microsoft data-center chief internal memo item as an internal communication rather than a discrete industry development."
+    }
+  ],
+  "rejected": [
+    {
+      "headline": "Nvidia says Rubin platform is in full production",
+      "url": "https://nvidianews.nvidia.com/news/rubin-platform-ai-supercomputer",
+      "reason": "event dated 2026-01-05, outside 2026-08-01..2026-09-13"
+    },
+    {
+      "headline": "Microsoft plans to more than triple data-center capacity to over 38 gigawatts by 2032",
+      "url": "https://www.bloomberg.com/news/features/2026-09-10/microsoft-ai-focused-data-center-plan-to-add-26-gigawatts-of-compute",
+      "reason": "page unreadable (HTTP 403) and search fallback found no copy"
+    }
+  ],
+  "events": [
+    {
+      "headline": "Microsoft's India South Central cloud region in Hyderabad becomes generally available",
+      "detail": "Microsoft announced general availability of its India South Central cloud region in Hyderabad, Telangana on August 6, 2026. The region, Microsoft's fourth in India, has three Availability Zones and is backed by Microsoft's $20.5 billion investment commitment to India's cloud and AI future. Early access customers include Adani Group, Bajaj Finserv, HDFC Bank and PB Pay.",
+      "source_name": "Microsoft Source Asia",
+      "source_url": "https://news.microsoft.com/source/asia/features/microsofts-newest-india-datacenter-region-goes-live-to-power-the-countrys-ai-economy-and-enable-frontier-firms/",
+      "occurred_at": "2026-08-06",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 60,
+      "verify_reasoning": "The page explicitly states Microsoft today announced general availability of the India South Central region in Hyderabad on August 6, 2026, with supporting details on customers and investment figures.",
+      "discovered_by": "directed_search",
+      "should_be_material": false,
+      "materiality_score": 32.0,
+      "materiality_reasoning": "A new Azure region going GA is routine cloud infrastructure news; the AI-industry-relevant angle is the $20.5B India commitment, which was itself announced earlier and is the more memorable item. For a group focused on model releases, funding, chips and policy, a regional datacenter launch is the kind of thing a dedicated follower might note but no one would be expected to know. A first-of-kind sovereign AI buildout or a novel compute commitment figure would have scored higher.",
+      "significance": "minor"
+    },
+    {
+      "headline": "Koray Kavukcuoglu named SVP to lead Google DeepMind's frontier AI development, replacing Demis Hassabis in that role",
+      "detail": "Koray Kavukcuoglu, DeepMind's former CTO, is becoming head of the unit, reporting directly to Google CEO Sundar Pichai and overseeing Gemini model development, frontier AI research, and the Gemini app and developer teams. He replaces cofounder and CEO Demis Hassabis in this role, with Hassabis becoming the organization's chair. The move comes as Google tries to close the gap with OpenAI and Anthropic, which have outpaced Google's Gemini releases in 2026, and follows reports that Gemini 3.5 Pro was delayed to improve coding performance.",
+      "source_name": "CNBC",
+      "source_url": "https://www.cnbc.com/2026/08/12/google-deepmind-koray-kavukcuoglu.html",
+      "occurred_at": "2026-08-12",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 72,
+      "verify_reasoning": "The page directly reports Kavukcuoglu's promotion to lead DeepMind's frontier AI efforts, replacing Hassabis, with specific details on his new responsibilities and the competitive context, dated August 12, 2026.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 86.0,
+      "materiality_reasoning": "A leadership change at the top of Google DeepMind — with Hassabis stepping aside from running frontier model development into a chair role and Kavukcuoglu reporting directly to Pichai — is exactly the kind of headline anyone following the AI industry would have seen, especially framed against the Gemini-vs-OpenAI/Anthropic race and a delayed Gemini 3.5 Pro. No recent events are recorded, so there's no saturation discount. Only a much lower-level reorg or a purely rumored move would have pulled this below the threshold.",
+      "significance": "major"
+    },
+    {
+      "headline": "Anthropic to embed machine-readable watermarks in Claude AI outputs from August 2, 2026 to comply with EU AI Act",
+      "detail": "Anthropic announced that all Claude products released from 2 August 2026 onward will include machine-readable marking in AI-generated content, with older models to be updated by 2 December 2026. The move is to comply with Article 50(2) of the EU AI Act, which requires providers to mark synthetic content as machine-readable and detectable. Anthropic said the watermark will be invisible, appearing either in text output or in metadata for audio, image, or video files, and will roll out globally, not just in the EU.",
+      "source_name": "Artificial Lawyer",
+      "source_url": "https://www.artificiallawyer.com/2026/08/13/anthropic-will-embed-watermarks-in-ai-outputs/",
+      "occurred_at": "2026-08-13",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 55,
+      "verify_reasoning": "The page directly reports Anthropic's announcement of watermarking for Claude outputs starting August 2, 2026, tied to EU AI Act Article 50(2) compliance, matching the candidate's claims.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 68.0,
+      "materiality_reasoning": "A frontier lab committing to machine-readable watermarking across all outputs — and doing it globally rather than EU-only — is a first-of-its-kind compliance move under the AI Act's Article 50, sitting squarely in this group's policy remit and likely to set a precedent others are measured against. No saturating prior events on watermarking or AI Act compliance in the recent list, which raises novelty value. It falls short of the top band because it is an announced compliance mechanism rather than a model release or major deal, and the reporting source is relatively niche; broader mainstream pickup would have pushed it higher.",
+      "significance": "borderline"
+    },
+    {
+      "headline": "Anthropic's Claude suffers major outage affecting Claude.ai, Claude Code and Claude Cowork.",
+      "detail": "The outage began around 21:58 UTC on August 16, 2026, when Anthropic reported authentication issues affecting Claude.ai, Claude Code, and Claude Cowork. At 22:07 UTC, Anthropic reported degraded performance also affecting platform.claude.com. Users experienced login failures, loading errors, and incomplete requests. By 22:40 UTC, Anthropic confirmed all services were restored.",
+      "source_name": "Bleeping Computer",
+      "source_url": "https://www.bleepingcomputer.com/news/artificial-intelligence/anthropic-confirms-claude-is-down-in-major-outage-affecting-multiple-services/",
+      "occurred_at": "2026-08-16",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 68,
+      "verify_reasoning": "The page directly reports the outage with specific timestamps, affected services, and resolution, matching the candidate event.",
+      "discovered_by": "directed_search",
+      "should_be_material": false,
+      "materiality_score": 27.0,
+      "materiality_reasoning": "A ~45-minute authentication outage that was fully resolved the same hour is operational noise rather than an industry-shaping event; the group's stated focus is model releases, funding, compute, and policy. It generated momentary chatter among Claude Code users but leaves no lasting thread, and not knowing about it days later would cost nothing in conversation. A prolonged multi-day outage, data exposure, or capacity/compute root cause would have changed the verdict.",
+      "significance": "minor"
+    },
+    {
+      "headline": "Amazon and Nvidia expand AWS partnership with 2 million additional Nvidia GPUs for 2027-2028",
+      "detail": "Amazon and Nvidia announced Wednesday an expanded deal adding 2 million more Nvidia GPUs, including Blackwell Ultra, Rubin, and Rubin Ultra chips, to AWS data centers starting in Q3 and continuing through 2027-2028. This follows a March deal for over 1 million GPUs, with Nvidia citing demand that 'has exceeded expectations.' The deal also includes integration of Nvidia's networking hardware, CPUs, open models, and robotics platform (Omniverse, Cosmos, Isaac, Jetson) across AWS.",
+      "source_name": "TechCrunch",
+      "source_url": "https://techcrunch.com/2026/08/26/amazon-just-tripled-its-order-of-nvidia-chips-over-surging-demand/",
+      "occurred_at": "2026-08-26",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 78,
+      "verify_reasoning": "The page directly reports the announced expanded Amazon-Nvidia partnership with 2 million additional GPUs for 2027-2028, matching the candidate's detail, though the headline's 'tripled' framing is the article's own title phrasing based on cumulative orders.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 84.0,
+      "materiality_reasoning": "A hyperscaler tripling its Nvidia order to ~2M GPUs spanning Blackwell Ultra through Rubin Ultra is a headline compute/chips datapoint that speaks directly to AI demand, capex, and Nvidia's roadmap — core subject matter for this group, and no saturating similar events are recorded. Not knowing it would be a visible gap in any conversation about AI infrastructure buildout; a smaller vendor deal or a mere reiteration of the March agreement would have scored lower.",
+      "significance": "major"
+    },
+    {
+      "headline": "US urges deregulation while EU enforces AI Act at G20 innovation ministerial in Chapel Hill",
+      "detail": "At a G20 'innovation' ministerial in Chapel Hill, North Carolina on September 1, 2026, US tech adviser Michael Kratsios pushed the 'Carolina Principles' against technology-specific regulation, joined by Meta's Mark Zuckerberg and Tesla's Elon Musk arguing for fewer AI constraints. The same day, the European Commission confirmed it sent information requests to more than 30 AI companies worldwide as a preliminary step toward possible investigations under the EU AI Act, focusing on safety and copyright compliance. Commission VP Henna Virkkunen, who attended the meeting, said Brussels is 'ready to take all necessary steps' to enforce the law.",
+      "source_name": "Al Jazeera",
+      "source_url": "https://www.aljazeera.com/news/2026/9/2/us-pushes-looser-approach-to-ai-regulation-while-eu-pushes-new-law",
+      "occurred_at": "2026-09-01",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 65,
+      "verify_reasoning": "The article directly reports the G20 innovation ministerial on September 1, 2026, with US officials pushing deregulation and the EU simultaneously sending compliance requests to AI companies under its AI Act, matching the candidate event.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 74.0,
+      "materiality_reasoning": "A high-profile transatlantic regulatory clash — US officials pushing 'Carolina Principles' deregulation with Zuckerberg and Musk present, while the Commission simultaneously opens preliminary AI Act information requests to 30+ companies — is exactly the kind of AI policy development anyone following the industry would be discussing, and the EU enforcement step directly affects major labs. It falls short of the top band because ministerial declarations and preliminary information requests are process steps rather than binding actions, and no recorded prior events establish an escalating thread here.",
+      "significance": "borderline"
+    },
+    {
+      "headline": "Cognition AI is set to raise about $1 billion at a $47 billion valuation.",
+      "detail": "AI coding startup Cognition AI Inc. is close to finalizing a new funding round that would value it at roughly $47 billion. The company is raising around $1 billion, though the final size may exceed that given investor demand. Cognition reportedly received nearly $10 billion in investor interest for the round, according to people familiar with the matter.",
+      "source_name": "Bloomberg",
+      "source_url": "https://www.bloomberg.com/news/articles/2026-09-02/ai-startup-cognition-set-to-raise-around-1-billion-at-a-47-billion-value",
+      "occurred_at": "2026-09-02",
+      "verified_via": "web_search",
+      "http_status": 403,
+      "candidate_confidence": 75,
+      "verify_reasoning": "The page directly reports the funding round, valuation, raise amount, and investor interest matching the candidate.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 81.0,
+      "materiality_reasoning": "A ~$1B raise at a $47B valuation for a prominent AI coding startup (with ~$10B in reported investor demand) is a headline-tier funding event in a group explicitly defined around AI company funding and deals, and it implies a dramatic valuation step-up that would be widely discussed. No recent events dilute it via saturation. A smaller round or a less prominent company would have pushed this toward the 50s.",
+      "significance": "major"
+    },
+    {
+      "headline": "Meta agrees to $18 billion youth-safety settlement with 29 state attorneys general",
+      "detail": "Meta settled with 29 U.S. state attorneys general after going to trial in August over claims Instagram and Facebook design features harmed younger users. Meta agreed to core platform changes for under-18 users, including a two-hour daily usage limit, disabling extreme makeup/cosmetic surgery filters, and tighter age verification. Meta will pay the $18 billion settlement over ten years and is booking a $10 billion legal charge in Q3. Payment in full is conditioned on rivals YouTube and TikTok making similar changes for younger users.",
+      "source_name": "CNBC",
+      "source_url": "https://www.cnbc.com/2026/09/02/meta-18-billion-settlement-ai-products.html",
+      "occurred_at": "2026-09-02",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 65,
+      "verify_reasoning": "The page confirms the $18 billion settlement with 29 state attorneys general, its terms, and analyst commentary about it clearing the way for new AI products, matching the candidate headline and detail.",
+      "discovered_by": "directed_search",
+      "should_be_material": true,
+      "materiality_score": 60.0,
+      "materiality_reasoning": "An $18B settlement by Meta is a headline-dominating tech story that anyone following the AI industry would almost certainly have seen, and it touches AI-adjacent policy (design features, age verification, teen safety) that increasingly shapes AI product rules. Still, it sits outside the group's core focus of model releases, funding, and compute, so it is material by sheer magnitude and Meta's centrality rather than by topical fit; if the settlement had not involved a top-tier AI lab or had been an order of magnitude smaller, I'd have scored it well below 50.",
+      "significance": "borderline"
+    }
+  ],
+  "short_of_target": false
+}

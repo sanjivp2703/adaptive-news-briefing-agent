@@ -1,0 +1,194 @@
+{
+  "id": "sam_beginner",
+  "display_name": "Sam Ilori",
+  "archetype": "barely_informed",
+  "notes": "The case that broke the old design. Under the quiz-and-score model a beginner was interrogated about things nobody had told them, scored near zero, and the system read that as a stable estimate rather than as its own failure to explain anything. Under the redesign this persona is the cold-start check: every exchange must state the news before asking anything, and terms this person does not know must be explained rather than assumed. `assumed_without_asking` being non-empty for this persona is a straight failure, because it means the system decided someone understood a word purely because they never interrupted. Events are the real, verified August 2026 startup/VC items from research/startup_founders.md.",
+  "profile": {
+    "bio": "Two months into a first job as a designer at a Series A company. Hears these words in standups every day and has never asked what any of them mean."
+  },
+  "seed": 20260904,
+  "interactions": 8,
+  "learning": {
+    "schema": "v1",
+    "prior_knowledge": 0.1,
+    "memory_rate": 0.75
+  },
+  "group": {
+    "name": "Startup funding, new to it",
+    "description": "Funding rounds, valuations and exits, for someone who has just started working at a startup.",
+    "poll_interval_minutes": 360,
+    "vocabulary": [
+      "acquisition",
+      "valuation",
+      "arr",
+      "venture funding",
+      "market capitalization",
+      "series c",
+      "ipo"
+    ],
+    "subdomains": {
+      "funding mechanics": [
+        "venture funding",
+        "series c",
+        "series a",
+        "series b",
+        "funding round",
+        "lead investor"
+      ],
+      "valuation & metrics": [
+        "valuation",
+        "arr",
+        "run-rate",
+        "annualized revenue",
+        "pre-money"
+      ],
+      "exits": [
+        "acquisition",
+        "ipo",
+        "all-stock deal",
+        "buyout"
+      ],
+      "public markets": [
+        "market capitalization",
+        "share price",
+        "listing"
+      ]
+    }
+  },
+  "knows": [
+    "acquisition"
+  ],
+  "does_not_know": [
+    "valuation",
+    "arr",
+    "venture funding",
+    "market capitalization",
+    "series c",
+    "ipo"
+  ],
+  "familiar_subdomains": {
+    "funding mechanics": 0.1,
+    "valuation & metrics": 0.05,
+    "exits": 0.3,
+    "public markets": 0.1
+  },
+  "style": {
+    "median_words": 8,
+    "variance": 1.0,
+    "lowercase": false,
+    "drop_terminal_punct_rate": 0.5,
+    "ask_rate_default": 0.2,
+    "ask_rate_unknown_present": 0.5,
+    "react_rate": 0.06,
+    "continue_rate": 0.45,
+    "max_turns": 3,
+    "clarify_share": 0.9,
+    "check_belief_share": 0.1,
+    "remark_share": 0.4,
+    "context_rate": 0.35,
+    "gap_admit_rate": 0.25,
+    "redirect_rate": 0.12
+  },
+  "events": [
+    {
+      "headline": "Databricks raised $5 billion at a $190 billion valuation, led by Coatue, after originally planning to raise only $1 billion.",
+      "detail": "CEO Ali Ghodsi said the company set out to raise $1 billion, but press coverage of the raise triggered roughly $15 billion of inbound investor interest, and Databricks issued more stock than planned rather than turn existing backers away. The company disclosed a $7 billion annualized revenue run-rate growing more than 80% year over year, with the core cloud data warehouse product at $1.5 billion and Lakebase at $100 million.",
+      "source_url": "https://techcrunch.com/2026/08/13/databricks-wanted-to-raise-1b-investors-wanted-15b-it-settled-on-5b-at-a-190b-valuation/",
+      "source_name": "TechCrunch",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "valuation"
+      ],
+      "occurred_hours_ago": 4.0
+    },
+    {
+      "headline": "Global venture funding reached $42 billion across just over 1,500 startups in August 2026, down 25% from July but up 122% from August 2025.",
+      "detail": "Seven companies raised billion-dollar rounds during the month, tying for the second-highest monthly count of 2026 behind July's 13. The largest disclosed round was Databricks at $5 billion and a $190 billion valuation, followed by defense-tech company Hadrian, custom AI fine-tuning startup River AI, low-orbit satellite operator Yuanxin Satellite, nuclear energy company Valar Atomics, automated-coding startup Poolside, and home-battery company Base Power.",
+      "source_url": "https://news.crunchbase.com/venture/global-funding-billion-dollar-deals-august-2026/",
+      "source_name": "Crunchbase News",
+      "should_be_material": false,
+      "significance": "major",
+      "concepts": [
+        "venture funding"
+      ],
+      "occurred_hours_ago": 5.0
+    },
+    {
+      "headline": "Vibe-coding platform Lovable confirmed a $400 million Series C at a $13.3 billion valuation.",
+      "detail": "The round was led by Menlo Ventures and the Scaleup Europe Fund with more than a dozen other investors; Lovable reported roughly $500 million ARR as of June 2026, hosts 60 million projects and cites 900 million monthly visitors, and now trains an in-house model alongside frontier models. The valuation roughly doubled from $6.6 billion in December 2025.",
+      "source_url": "https://techcrunch.com/2026/08/12/lovable-confirms-new-13-3b-valuation-raises-another-400m/",
+      "source_name": "TechCrunch",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "series c",
+        "arr"
+      ],
+      "occurred_hours_ago": 6.0
+    },
+    {
+      "headline": "Personal AI assistant startup Instinct was reported to have raised a $250 million Series B at a $2.5 billion valuation, co-led by Index Ventures and Benchmark, bringing its total funding to $350 million.",
+      "detail": "The round brings total funding to $350 million for a company founded in 2025 by 23-year-old Noah Shinn, whose product handles tasks by text and phone, including travel planning, grocery ordering and subscription cancellation, after users connect it to their apps and devices. The product was still in private beta at the time of the raise, and had drawn privacy criticism over the breadth of permissions in its terms of service.",
+      "source_url": "https://techcrunch.com/2026/08/26/viral-ai-startup-instinct-has-raised-350-million-at-a-2-5-billion-valuation/",
+      "source_name": "TechCrunch",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "valuation"
+      ],
+      "occurred_hours_ago": 3.0
+    },
+    {
+      "headline": "Emerald AI announced a $150 million Series A at a $1.05 billion valuation, co-led by Energize Capital and DCVC, to make AI data centers grid-flexible.",
+      "detail": "The round was co-led by Energize Capital and DCVC with participation from Nvidia, Samsung Ventures, Siemens, GE Vernova, RWE, Aramco Ventures, Salesforce Ventures, In-Q-Tel, Radical Ventures, Lowercarbon Capital and others including John Doerr and Tom Steyer, bringing total funding above $220 million. Its Emerald Conductor platform orchestrates AI workloads and on-site energy resources to throttle a facility's power draw when the grid is stressed, which the company argues could unlock over 100 gigawatts on the existing US grid.",
+      "source_url": "https://venturebeat.com/business/emerald-ai-raises-150-million-series-a-at-105-billion-valuation-to-scale-power-flexible-ai-data-centers",
+      "source_name": "VentureBeat",
+      "should_be_material": true,
+      "significance": "minor",
+      "concepts": [],
+      "occurred_hours_ago": 7.0
+    },
+    {
+      "headline": "Chinese humanoid robot maker Unitree Robotics closed up about 460% on its Shanghai debut after raising roughly 6.1 billion yuan (about $904 million).",
+      "detail": "Shares were priced at 150.80 yuan, opened at 1,100 yuan (a 629% jump) and closed at 845 yuan, taking the market capitalization to about 342 billion yuan (about US$66 billion), up from roughly 61 billion yuan pre-trading. Demand was extraordinary, with about 9.8 million retail accounts competing for 9.7 million shares; Meituan, the largest outside shareholder, held an 8.7% post-IPO stake described as roughly a 70x return.",
+      "source_url": "https://www.scmp.com/tech/tech-trends/article/3364499/unitree-robotics-surges-629-us66-billion-valuation-shanghai-share-debut",
+      "source_name": "South China Morning Post",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "market capitalization",
+        "ipo"
+      ],
+      "occurred_hours_ago": 8.0
+    },
+    {
+      "headline": "Publicly traded Klaviyo acquired AI customer-success startup Agency, with founder Elias Torres becoming Klaviyo's chief product officer.",
+      "detail": "Agency, founded in 2023, had raised $32 million from Sequoia, Menlo Ventures and Felicis and had a 25-person team; terms were not disclosed. Torres previously co-founded Performable (acquired by HubSpot in 2011) and Drift (sold to Vista Equity for $1.2 billion in 2021), and had been an angel investor in Klaviyo's 2015 seed round; Klaviyo CEO Andrew Bialecki hired him at Performable in 2010.",
+      "source_url": "https://techcrunch.com/2026/08/05/klaviyo-acquires-elias-torres-agency-in-full-circle-reunion-for-tech-founders/",
+      "source_name": "TechCrunch",
+      "should_be_material": false,
+      "significance": "minor",
+      "concepts": [],
+      "occurred_hours_ago": 9.0
+    },
+    {
+      "headline": "SpaceX completed its all-stock, $60 billion acquisition of Anysphere, the company behind the AI coding tool Cursor.",
+      "detail": "The merger agreement was signed in June 2026 and the deal closed in mid-August, with SpaceX confirming completion in a regulatory filing; Cursor said it would gain access to the largest fleet of GPUs in the world. Cursor retained its own name and, unusually for a company closing an acquisition of this size, announced its own acqui-hire of Firetiger the day before closing.",
+      "source_url": "https://techcrunch.com/2026/08/15/spacex-officially-closes-its-cursor-acquisition/",
+      "source_name": "TechCrunch",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "acquisition"
+      ],
+      "occurred_hours_ago": 2.0
+    }
+  ],
+  "reading": "bouncer",
+  "quantities": [
+    "arr",
+    "market capitalization",
+    "valuation"
+  ]
+}

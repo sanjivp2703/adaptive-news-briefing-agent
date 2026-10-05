@@ -1,0 +1,205 @@
+{
+  "id": "theo_silent",
+  "display_name": "Theo Marsden",
+  "archetype": "disengaged",
+  "notes": "The adversarial persona, and the only one whose result is a structural pass/fail rather than a measurement. It knows nothing in this domain and never asks anything: every reply is minimal acknowledgement ('ok', 'huh', 'makes sense'), never a question, never a term used, never a misunderstanding revealed. So every input to the proficiency band comes from the system's own output. The single property under test is that its band NEVER rises above `beginner`. If it climbs, the silence spiral is real and reachable: the system reads not-asking as understanding, raises the band, explains less because of it, and gets even less engagement in return. Its terms deliberately repeat across events so exposure accumulates fast and crosses EXPOSURES_BEFORE_ASSUMED several times over -- the whole point is to give the `assumed` path every chance to fire and then check that it did not move the band. Events are the real, verified August 2026 wine items from research/wine.md, chosen because wine is the domain nothing in this system was designed around.",
+  "profile": {
+    "bio": "Signed up because a colleague did. Opens the messages, reads maybe the first line, replies to be polite."
+  },
+  "seed": 20260905,
+  "interactions": 8,
+  "learning": {
+    "schema": "v1",
+    "prior_knowledge": 0.1,
+    "memory_rate": 1.0
+  },
+  "group": {
+    "name": "Wine, barely following",
+    "description": "Harvest, vintage conditions and the state of the wine trade.",
+    "poll_interval_minutes": 720,
+    "vocabulary": [
+      "harvest",
+      "vintage",
+      "yields",
+      "potential alcohol",
+      "budburst",
+      "abv"
+    ],
+    "subdomains": {
+      "viticulture & harvest": [
+        "harvest",
+        "budburst",
+        "yields",
+        "vintage",
+        "veraison",
+        "picking",
+        "hectolitres per hectare"
+      ],
+      "winemaking & chemistry": [
+        "potential alcohol",
+        "abv",
+        "fermentation",
+        "acidity",
+        "brix"
+      ],
+      "appellation rules": [
+        "appellation",
+        "denominación de origen",
+        "cru",
+        "classification",
+        "labelling rule"
+      ],
+      "commercial & market": [
+        "ebits",
+        "impairments",
+        "reference minimum",
+        "grape price",
+        "imports",
+        "glut"
+      ]
+    }
+  },
+  "knows": [],
+  "does_not_know": [
+    "harvest",
+    "vintage",
+    "yields",
+    "potential alcohol",
+    "budburst",
+    "abv"
+  ],
+  "familiar_subdomains": {
+    "viticulture & harvest": 0.1,
+    "winemaking & chemistry": 0.05,
+    "appellation rules": 0.05,
+    "commercial & market": 0.1
+  },
+  "noise": {
+    "never_engages": true
+  },
+  "style": {
+    "median_words": 5,
+    "variance": 1.0,
+    "lowercase": true,
+    "drop_terminal_punct_rate": 0.6,
+    "ask_rate_default": 0.0,
+    "ask_rate_unknown_present": 0.0,
+    "react_rate": 0.0,
+    "continue_rate": 0.0,
+    "max_turns": 0,
+    "clarify_share": 0.0,
+    "check_belief_share": 0.0,
+    "remark_share": 0.0,
+    "context_rate": 0.0,
+    "gap_admit_rate": 0.0,
+    "redirect_rate": 0.0
+  },
+  "events": [
+    {
+      "headline": "The first 2026 grapes in Champagne and Bordeaux were picked on 6 August under special dispensation, a record-early first cut for both regions, with Champagne's general harvest opening 12-17 August.",
+      "detail": "In Champagne, grower Vincent Finot at Montgueux (Aube) obtained a derogation to pick Chardonnay on 6 August at over 11% potential alcohol, which Vitisphere reported as at least ten days ahead of the already-early 2025; in Bordeaux the same day, Merlot and Semillon destined for sparkling wine were cut at around 9% potential alcohol with total acidity of 7-8 g/L. The general Champagne harvest then opened officially between 12 and 17 August depending on cru and variety.",
+      "source_url": "https://www.vitisphere.com/actualite-107179-debut-des-vendanges-ce-6-aout-champagne-et-bordeaux-battent-un-nouveau-record-de-precocite.html",
+      "source_name": "Vitisphere",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "harvest",
+        "potential alcohol"
+      ],
+      "occurred_hours_ago": 6.0
+    },
+    {
+      "headline": "Burgundy began picking Cremant fruit on 8 August 2026, the earliest start in the BIVB's records, with growers reporting sharply reduced volumes.",
+      "detail": "The BIVB reported first Cremant de Bourgogne picking on 8 August 2026, a new earliness record beating the previous mark of 13 August 2022, with the first Chardonnays around 17 August and Pinot Noir shortly after; budburst had been around 28 March after a mild, wet winter. On the ground in Beaune, Bill Nanson of Burgundy-Report described day one of picking on 24 August with reds running 50-70% lower yields than normal.",
+      "source_url": "https://www.bourgognes.wine/2026-harvest-in-burgundy/",
+      "source_name": "BIVB (Bourgogne Wine Board)",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "budburst",
+        "yields",
+        "harvest"
+      ],
+      "occurred_hours_ago": 8.0
+    },
+    {
+      "headline": "Napa Valley's 2026 harvest ran weeks ahead of normal, with sparkling fruit picked from 21 July and the first Sauvignon Blanc on 6 August, into a crop growers described as markedly smaller than the previous three vintages.",
+      "detail": "The first Sauvignon Blanc of the 2026 Napa harvest arrived at Napa Wine Co.'s Oakville facility on 6 August, with Round Pond Estate having already picked sparkling Chardonnay on 21 July, after an unusually warm March and April accelerated ripening. Growers described a crop markedly smaller than recent years, with lower yields but, they argued, better concentration.",
+      "source_url": "https://napavalleyregister.com/news/havest-2026-dispatch-one/article_258d19cd-406b-4523-b9cf-9eef966a7e99.html",
+      "source_name": "Napa Valley Register",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "harvest",
+        "yields"
+      ],
+      "occurred_hours_ago": 10.0
+    },
+    {
+      "headline": "Rioja's 2026 harvest officially opened on 6 August, reported as the region's earliest ever start, and 2026 is the first vintage to which its new Vendimia Temprana low-alcohol category and partial de-alcoholisation allowance apply.",
+      "detail": "The 2026 Rioja harvest officially opened on Thursday 6 August, described as earlier than any previous start in the region. From the 2026 vintage Rioja also permits a new Vendimia temprana (early harvest) designation for reds under 12% abv and whites and roses under 11%, and lowers minimum alcohol for classic Rioja.",
+      "source_url": "https://magazine.wein.plus/news/rioja-from-2026-with-less-alcohol-and-new-categories-new-vendimia-temprana-and-partial-de-alcoholization",
+      "source_name": "wein.plus",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "harvest",
+        "vintage",
+        "abv"
+      ],
+      "occurred_hours_ago": 13.0
+    },
+    {
+      "headline": "Treasury Wine Estates reported a A$1.08bn statutory net loss for the year to 30 June 2026, driven by US asset impairments.",
+      "detail": "Net sales revenue fell 12.8% to A$2.56bn on shipments down 9.9% to 19.2 million cases. The company said it was addressing the structural misalignment in the U.S. including a reduction in North Coast vintage make sizes from vintage 2026.",
+      "source_url": "https://www.pressdemocrat.com/2026/08/14/treasury-wine-estates-fiscal-2026-financial-results/",
+      "source_name": "The Press Democrat",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "vintage"
+      ],
+      "occurred_hours_ago": 7.0
+    },
+    {
+      "headline": "Cava growers in Penedes reported being offered 25-30 cents a kilo for 2026 fruit against an official reference minimum of 94 cents, as the DO pledged around EUR 100m to growers.",
+      "detail": "With Cava sales down from 250 million bottles in 2023 to 190 million in 2025, growers reported offers well below production costs days before the harvest began, and a growers' poll put roughly 4,000 tonnes at risk of remaining unsold.",
+      "source_url": "https://en.ara.cat/economy/the-do-cava-assures-that-it-will-maintain-the-price-of-grapes-with-the-delivery-of-100-m-to-the-winegrowers_1_5817584.html",
+      "source_name": "ARA",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "harvest"
+      ],
+      "occurred_hours_ago": 11.0
+    },
+    {
+      "headline": "US wine imports fell 16.8% by volume and 25.2% by value in the first half of 2026 against the same period of 2025, according to an OIVE analysis of US customs data.",
+      "detail": "Analysis by the Spanish interprofessional body OIVE of US customs data showed the US imported 536.8 million litres of wine worth EUR 2.43bn in January-June 2026, with average import price down 10.1% to EUR 4.52/litre.",
+      "source_url": "https://winenews.it/en/us-wine-import-at-2-4-billion-euros-in-first-semester-of-2026-25-2-italy-in-line_599588/",
+      "source_name": "WineNews",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [],
+      "occurred_hours_ago": 9.0
+    },
+    {
+      "headline": "The US Alcohol and Tobacco Tax and Trade Bureau published a final rule on 17 August 2026 establishing the 29,387-acre Columbia Hills American Viticultural Area in Washington State, effective 16 September 2026.",
+      "detail": "The final rule, published in the Federal Register on 17 August 2026 and effective 16 September 2026, creates the Columbia Hills AVA in Klickitat County, Washington, entirely within the existing Columbia Valley AVA, covering vineyards whose 2026 vintage will be the first eligible to use it.",
+      "source_url": "https://www.federalregister.gov/documents/2026/08/17/2026-16701/establishment-of-the-columbia-hills-viticultural-area",
+      "source_name": "Federal Register / TTB",
+      "should_be_material": false,
+      "significance": "minor",
+      "concepts": [
+        "vintage"
+      ],
+      "occurred_hours_ago": 12.0
+    }
+  ],
+  "reading": "bouncer",
+  "quantities": [
+    "abv",
+    "potential alcohol",
+    "yields"
+  ]
+}

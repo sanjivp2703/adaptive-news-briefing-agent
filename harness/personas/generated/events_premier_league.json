@@ -1,0 +1,116 @@
+{
+  "group": {
+    "slug": "premier_league",
+    "name": "Premier League",
+    "description": "English top-flight football: results, squads, injuries, refereeing and the transfer market.",
+    "poll_interval_minutes": 240
+  },
+  "generated_at": "2026-09-14T14:31:55+00:00",
+  "run_id": "persona_gen_20260914T142735Z",
+  "window": {
+    "start": "2026-08-01",
+    "end": "2026-09-13"
+  },
+  "passes": [
+    {
+      "pass": 1,
+      "method": "directed_search",
+      "candidates_from_search": 0,
+      "candidates": 0,
+      "excluded_by_source_selection": 0,
+      "note": "BadRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cf3VbpXpd3Ahm1U6wiujE'}"
+    },
+    {
+      "pass": 2,
+      "method": "directed_search",
+      "candidates_from_search": 0,
+      "candidates": 0,
+      "excluded_by_source_selection": 0,
+      "note": "BadRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cf3VcvdTmsLPSwJYDKw3b'}"
+    }
+  ],
+  "rejected": [],
+  "events": [
+    {
+      "headline": "Falcons LB Jalon Walker tears ACL in training camp, out for 2026 season",
+      "detail": "The Atlanta Falcons announced Wednesday that imaging confirmed Jalon Walker suffered a torn ACL during Tuesday's training camp practice, ending his season. Walker, the No. 15 overall pick in the 2025 NFL Draft, was carted off after going down during a non-padded practice. As a rookie in 2025, he appeared in 15 games (nine starts) with 36 tackles, 5.5 sacks, two forced fumbles and one fumble recovery.",
+      "source_name": "NFL.com",
+      "source_url": "https://www.nfl.com/news/falcons-lb-jalon-walker-feared-to-have-torn-acl-in-training-camp-practice",
+      "occurred_at": "2026-08-04",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 88,
+      "verify_reasoning": "The page directly reports the Falcons' confirmation of Walker's torn ACL suffered in a training camp practice, ending his season, matching the candidate headline.",
+      "should_be_material": true,
+      "materiality_score": 72.0,
+      "materiality_reasoning": "A first-round pick and productive young starter losing an entire season to a torn ACL in camp is exactly the kind of injury news NFL followers track, and it reshapes Atlanta's defensive outlook for 2026. It falls short of the top band because Walker is not a household-name star and it's a single non-contender's roster loss, but with no saturation from similar recent events it stands out clearly.",
+      "significance": "borderline",
+      "discovered_by": "system_pipeline"
+    },
+    {
+      "headline": "Texans WR Jayden Higgins tears ACL, out for 2026 season",
+      "detail": "Jayden Higgins suffered a torn ACL during Tuesday's joint practice with the Las Vegas Raiders, NFL Network's Ian Rapoport reported Wednesday. The second-year wideout, the No. 34 overall pick in the 2025 NFL Draft, caught 41 passes for 525 yards and six touchdowns as a rookie. He will miss the entire 2026 season, with Houston expected to rely on Xavier Hutchinson, Jaylin Noel and Justin Watson to fill the void.",
+      "source_name": "NFL.com",
+      "source_url": "https://www.nfl.com/news/texans-wr-jayden-higgins-torn-acl-out-2026-season",
+      "occurred_at": "2026-08-18",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 78,
+      "verify_reasoning": "The page confirms Higgins tore his ACL in an August joint practice with the Raiders and will miss the 2026 season, matching the candidate headline and detail.",
+      "should_be_material": true,
+      "materiality_score": 62.0,
+      "materiality_reasoning": "A season-ending ACL tear to a recent second-round pick who was a productive rookie starter is significant NFL injury news, reported by a top insider during a heavily covered preseason window, and it reshapes Houston's receiving corps. It's not a superstar-level injury that would dominate national conversation for weeks, so it sits in the 'likely to come up, small visible gap' band; a bigger name or a franchise QB would have pushed this well above 80.",
+      "significance": "borderline",
+      "discovered_by": "system_pipeline"
+    },
+    {
+      "headline": "Summer 2026 Premier League transfer window closed on 1 September with a wave of deadline-day deals",
+      "detail": "The window closed in England at 11pm on 1 September 2026, with confirmed moves including Enzo Fernandez from Chelsea to Manchester City for £125m, Iliman Ndiaye from Everton to Manchester City for £65m, and Ibrahim Mbaye from PSG to Aston Villa for £47m. Other deals included Matias Fernandez-Pardo to Newcastle for £51m and Malick Fofana to Sunderland for £31m, alongside dozens of Championship, League One and League Two moves.",
+      "source_name": "Sky Sports",
+      "source_url": "https://www.skysports.com/transfer/news/12691/13579708/transfer-deadline-day-deals-summer-2026-confirmed-moves-across-premier-league-championship-efl-europe-and-more",
+      "occurred_at": "2026-09-01",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 60,
+      "verify_reasoning": "The page explicitly confirms the 1 September 2026 deadline and lists numerous specific confirmed transfers with fees across the Premier League and lower divisions.",
+      "should_be_material": true,
+      "materiality_score": 92.0,
+      "materiality_reasoning": "Deadline day itself is a fixture of the Premier League calendar and a £125m intra-league move of Enzo Fernandez from Chelsea to Manchester City would be the dominant talking point for weeks, shaping squad and title discussion. No saturating prior events are recorded, and the magnitude of the headline deals alone makes non-awareness a glaring gap. Only a window with no marquee moves would have pulled this down.",
+      "significance": "major",
+      "discovered_by": "system_pipeline"
+    },
+    {
+      "headline": "D'Andre Swift and the Bears agree to a three-year, $33.75 million contract extension",
+      "detail": "The Chicago Bears and running back D'Andre Swift agreed to a three-year, $33.75 million extension with $27.5 million guaranteed, per ESPN's Adam Schefter. Swift was previously entering the final year of a three-year, $24 million deal. The new contract keeps him under contract through his age-30 season in 2029, and comes two days before the Bears' 2026 season opener at the Carolina Panthers.",
+      "source_name": "Bleacher Report",
+      "source_url": "https://bleacherreport.com/articles/25498360-dandre-swift-bears-reportedly-agree-contract-extension-ahead-2026-nfl-season",
+      "occurred_at": "2026-09-11",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 65,
+      "verify_reasoning": "The page explicitly reports the Bears and Swift agreeing to a three-year, $33.75 million extension with $27.5 million guaranteed, citing Adam Schefter, dated September 11, 2026.",
+      "should_be_material": false,
+      "materiality_score": 3.0,
+      "materiality_reasoning": "This is an NFL contract extension, entirely outside the domain of English top-flight football — no overlap with Premier League results, squads, injuries, refereeing or transfers. A Premier League follower would have no expectation of knowing it, and not knowing it costs nothing. Only a cross-sport tie (e.g., shared ownership like the Bears/Chelsea link) could have raised relevance, and none exists here.",
+      "significance": "minor",
+      "discovered_by": "system_pipeline"
+    },
+    {
+      "headline": "Liverpool have four confirmed absentees and three doubts ahead of their Premier League match against Fulham.",
+      "detail": "Federico Chiesa, Giovanni Leoni, Conor Bradley and Hugo Ekitike are unavailable, while Bradley Barcola, Cody Gakpo and Joe Gomez are doubts. Barcola picked up cramp but is expected to be fine, Gakpo had an adductor issue and underwent a fitness test, and Gomez has returned to training after a hamstring injury. The full available squad, including goalkeepers Alisson, Mamardashvili and Woodman, was listed for the fixture.",
+      "source_name": "This Is Anfield",
+      "source_url": "https://www.thisisanfield.com/2026/09/liverpool-team-news-vs-fulham-injuries-squad/",
+      "occurred_at": "2026-09-12",
+      "verified_via": "get",
+      "http_status": 200,
+      "candidate_confidence": 62,
+      "verify_reasoning": "The page explicitly lists four unavailable players and three doubts for Liverpool's match against Fulham, matching the candidate's claim, with a publication date of September 12, 2026.",
+      "should_be_material": false,
+      "materiality_score": 32.0,
+      "materiality_reasoning": "Routine pre-match team news: minor knocks and fitness doubts for one club ahead of a single fixture, with no long-term or high-profile blows confirmed. For a broad Premier League group, this level of granular injury reporting is daily noise rather than something anyone would be expected to know; a confirmed season-ending injury to a star or a shock absence would have changed the verdict.",
+      "significance": "minor",
+      "discovered_by": "system_pipeline"
+    }
+  ],
+  "short_of_target": true
+}

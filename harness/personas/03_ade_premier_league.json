@@ -1,0 +1,215 @@
+{
+  "id": "ade_premier_league",
+  "display_name": "Ade Whitcombe",
+  "archetype": "partially_informed",
+  "notes": "The required noisy persona. Watches every match and carries the on-pitch vocabulary fluently, but started following English football only last season and has never had to learn transfer-market mechanics. Its noise is the two behaviours the spec names, and both aim at `assumed`, the weakest evidence in the model: it stays silent about terms it does not understand, so repetition alone can promote them, and it sometimes asks about terms it does understand, burning an interaction. Silence is decided once per term rather than per exposure -- people are consistently sheepish about particular words -- because crossing EXPOSURES_BEFORE_ASSUMED needs silence on every one of three exposures, and a per-exposure coin would make the attack land or not land on the luck of a seed. Event order is deliberate: the match vocabulary lands in rounds 1-5, then the deadline-day items land in rounds 6-8 so 'deadline day' accumulates three unquestioned exposures and crosses the threshold while 'loan' reaches only two and correctly does not. Events are the real, verified August-September 2026 items from research/premier_league.md.",
+  "profile": {
+    "bio": "Moved to Manchester in 2025 and got hooked. Watches every match, reads match reports, glazes over during deadline-day coverage."
+  },
+  "seed": 20260903,
+  "interactions": 8,
+  "learning": {
+    "schema": "v1",
+    "prior_knowledge": 0.5,
+    "memory_rate": 1.0
+  },
+  "group": {
+    "name": "Premier League",
+    "description": "English top-flight football: results, squads, injuries, refereeing and the transfer market.",
+    "poll_interval_minutes": 240,
+    "vocabulary": [
+      "promoted",
+      "relegation",
+      "var",
+      "penalty area",
+      "head coach",
+      "transfer window",
+      "deadline day",
+      "loan",
+      "add-ons"
+    ],
+    "subdomains": {
+      "results & league table": [
+        "promoted",
+        "relegation",
+        "points",
+        "goal difference",
+        "top four"
+      ],
+      "squads & coaching": [
+        "head coach",
+        "squad",
+        "injury",
+        "starting eleven",
+        "hamstring"
+      ],
+      "refereeing & laws": [
+        "var",
+        "penalty area",
+        "offside",
+        "handball",
+        "red card"
+      ],
+      "transfer calendar": [
+        "transfer window",
+        "deadline day",
+        "pre-contract"
+      ],
+      "deal mechanics": [
+        "loan",
+        "add-ons",
+        "release clause",
+        "sell-on clause",
+        "initial fee"
+      ]
+    }
+  },
+  "knows": [
+    "promoted",
+    "relegation",
+    "var",
+    "penalty area",
+    "head coach",
+    "transfer window"
+  ],
+  "does_not_know": [
+    "deadline day",
+    "loan",
+    "add-ons"
+  ],
+  "familiar_subdomains": {
+    "results & league table": 0.9,
+    "squads & coaching": 0.85,
+    "refereeing & laws": 0.6,
+    "transfer calendar": 0.5,
+    "deal mechanics": 0.25
+  },
+  "noise": {
+    "silent_when_ignorant_rate": 0.6,
+    "asks_about_known_rate": 0.25
+  },
+  "style": {
+    "median_words": 13,
+    "variance": 1.0,
+    "lowercase": false,
+    "drop_terminal_punct_rate": 0.5,
+    "ask_rate_default": 0.22,
+    "ask_rate_unknown_present": 0.45,
+    "react_rate": 0.08,
+    "continue_rate": 0.3,
+    "max_turns": 3,
+    "clarify_share": 0.65,
+    "check_belief_share": 0.2,
+    "remark_share": 0.5,
+    "context_rate": 0.3,
+    "gap_admit_rate": 0.15,
+    "redirect_rate": 0.12
+  },
+  "events": [
+    {
+      "headline": "Champions Arsenal beat newly promoted Coventry City 3-0 at the Emirates in the first match of the 2026/27 season.",
+      "detail": "Kai Havertz (15), Bukayo Saka (23) and Martin Odegaard (49) scored in a comfortable win; Declan Rice and Saka, both fresh from England's World Cup semi-final run, were withdrawn after an hour. It was Coventry's first Premier League match in 25 years.",
+      "source_url": "https://www.espn.com/soccer/report/_/gameId/401879301",
+      "source_name": "ESPN",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "promoted"
+      ],
+      "occurred_hours_ago": 3.0
+    },
+    {
+      "headline": "Newly promoted Hull City beat Manchester United 2-0 at the MKM Stadium on the opening weekend of the 2026/27 Premier League season.",
+      "detail": "Semi Ajayi scored from a corner in the 17th minute and Nobel Mendy headed a second on 38 minutes; United dominated possession but never seriously threatened. Hull manager Sergej Jakirovic had spent the week arguing his side could defy pundits who had written them off as relegation certainties.",
+      "source_url": "https://www.espn.com/soccer/story/_/id/49690579/man-united-fall-shock-hull-defeat-premier-league-opener",
+      "source_name": "ESPN",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "promoted",
+        "relegation"
+      ],
+      "occurred_hours_ago": 4.0
+    },
+    {
+      "headline": "VAR did not overturn the referee's no-penalty decision when Arsenal's Bruno Guimaraes went down under a stoppage-time challenge from Aston Villa's Ian Maatsen in the box; ESPN's VAR analyst called it a missed intervention.",
+      "detail": "In Aston Villa 0-1 Arsenal, Maatsen made a scissor challenge from behind on Guimaraes with no contact on the ball inside the penalty area; a brief VAR check upheld the referee's on-field no-penalty call. ESPN attributed the non-intervention to the Premier League's deliberately raised threshold for VAR intervention this season, under which only very clear errors are corrected.",
+      "source_url": "https://www.espn.com/soccer/story/_/id/49703019/premier-league-var-review-red-card-penalty-handball-goal-line-technology",
+      "source_name": "ESPN",
+      "should_be_material": false,
+      "significance": "borderline",
+      "concepts": [
+        "var",
+        "penalty area"
+      ],
+      "occurred_hours_ago": 2.0
+    },
+    {
+      "headline": "Newcastle United appointed Matthias Jaissle as head coach on a four-year deal, paying Saudi club Al Ahli around GBP 9.5m in compensation.",
+      "detail": "The 38-year-old German won two Austrian titles with RB Salzburg and back-to-back AFC Champions League titles with Al Ahli; his first match was a pre-season friendly against Valencia, with a Premier League opener at Liverpool on 23 August. Howe stepped down after a destabilising period in which Alexander Isak, Kieran Trippier, Anthony Gordon and Sandro Tonali all left and captain Bruno Guimaraes was expected to join Arsenal.",
+      "source_url": "https://www.skysports.com/football/news/11678/13568428/newcastle-united-appoint-matthias-jaissle-as-head-coach-following-eddie-howes-departure-from-st-james-park",
+      "source_name": "Sky Sports",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "head coach"
+      ],
+      "occurred_hours_ago": 5.0
+    },
+    {
+      "headline": "Manchester City signed Enzo Fernandez from Chelsea for GBP 125m as the summer transfer window closed, equalling the British transfer record.",
+      "detail": "The Argentina midfielder signed a five-year deal, reuniting with Enzo Maresca, his former Chelsea manager who is now City boss; Chelsea received GBP 5m above their GBP 120m asking price and booked an GBP 18m profit on the GBP 107m they paid Benfica in 2023. He became the first player in football history to move twice for more than GBP 100m, and joins Alan Shearer and Rio Ferdinand as the only players to break the British record twice in the Premier League era.",
+      "source_url": "https://www.skysports.com/football/news/11679/13579972/enzo-fernandez-transfer-news-man-city-sign-midfielder-from-chelsea-in-british-record-equalling-lb125m-deal",
+      "source_name": "Sky Sports",
+      "should_be_material": true,
+      "significance": "major",
+      "concepts": [
+        "transfer window"
+      ],
+      "occurred_hours_ago": 2.5
+    },
+    {
+      "headline": "Manchester City signed Iliman Ndiaye from Everton for GBP 65m on deadline day, and on the same day Jack Grealish rejoined Everton on a season-long loan from Manchester City.",
+      "detail": "The Ndiaye fee is GBP 60m guaranteed plus GBP 5m in bonuses on a five-year deal; City moved for him after Liverpool rejected an GBP 80m bid for Cody Gakpo and after a Tottenham agreement for Ndiaye collapsed. Grealish's loan covers the final year of his City contract and is his second spell at Everton, the first having been cut short in January by a stress fracture.",
+      "source_url": "https://www.skysports.com/football/news/11671/13579669/iliman-ndiaye-transfer-news-man-city-sign-lb65m-winger-from-everton-as-jack-grealish-joins-toffees-on-loan",
+      "source_name": "Sky Sports",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "deadline day",
+        "loan"
+      ],
+      "occurred_hours_ago": 3.0
+    },
+    {
+      "headline": "Newcastle United signed Belgium forward Matias Fernandez-Pardo from Lille for a reported GBP 51m on deadline day.",
+      "detail": "The 21-year-old signed a long-term deal and took the No. 20 shirt, becoming Newcastle's eighth first-team arrival of the summer and taking their spending to GBP 262m; he scored eight goals in 41 appearances for Lille last season and was in Belgium's 2026 World Cup squad. His arrival enabled Nick Woltemade's season-long loan to Juventus for a GBP 3.5m fee with no purchase option.",
+      "source_url": "https://www.skysports.com/football/news/11095/13579855/matias-fernandez-pardo-transfer-news-newcastle-sign-lille-forward-ahead-of-transfer-deadline-in-deal-worth-lb51m",
+      "source_name": "Sky Sports",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "deadline day",
+        "loan"
+      ],
+      "occurred_hours_ago": 3.5
+    },
+    {
+      "headline": "Sunderland signed Lyon winger Malick Fofana for a reported initial GBP 25.7m, rising to GBP 30.8m with add-ons, after beating a late Crystal Palace hijack attempt on deadline day.",
+      "detail": "The fee is an initial GBP 25.7m plus GBP 5.14m in add-ons; with both Premier League clubs having agreed terms with Lyon, Fofana sat at Lyon airport with two private jets waiting, one for Sunderland and one for London, and chose Sunderland roughly 70 minutes before the window shut, after owner Kyril Louis-Dreyfus flew to Lyon to persuade him. The announcement came at 00:15 on 2 September.",
+      "source_url": "https://www.skysports.com/football/news/11695/13580106/malick-fofana-sunderland-finally-complete-signing-of-lyon-winger-after-deadline-day-drama-with-crystal-palace",
+      "source_name": "Sky Sports",
+      "should_be_material": true,
+      "significance": "borderline",
+      "concepts": [
+        "deadline day",
+        "add-ons"
+      ],
+      "occurred_hours_ago": 4.5
+    }
+  ],
+  "reading": "skimmer",
+  "quantities": [
+    "add-ons"
+  ]
+}
