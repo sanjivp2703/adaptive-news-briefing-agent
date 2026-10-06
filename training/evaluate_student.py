@@ -246,6 +246,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--limit", type=int, default=None, help="score only the first N rows")
     parser.add_argument("--offline", action="store_true", help="replay the teacher as the student; no server needed")
     parser.add_argument("--max-tokens", type=int, default=1200)
+    parser.add_argument("--model", default=None,
+                        help="served model name to score instead of $LOCAL_MODEL_NAME, e.g. the untuned base model")
     args = parser.parse_args(argv)
 
     if not args.val.exists():
@@ -266,7 +268,7 @@ def main(argv: list[str] | None = None) -> int:
                 file=sys.stderr,
             )
             return 2
-        client = LocalModelClient()
+        client = LocalModelClient(model=args.model)
         student = local_student(client, max_tokens=args.max_tokens)
         label = f"{client.model} at {client.base_url}"
 

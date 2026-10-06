@@ -61,10 +61,22 @@ rm -rf "$WORK"
 export LOCAL_MODEL_BASE_URL="http://localhost:11434/v1"
 export LOCAL_MODEL_NAME="$MODEL_NAME"
 
-echo
-echo "Scoring the student against the teacher on the held-out split (45 packets)..."
 cd "$ROOT"
-PYTHONPATH=src:. "${PYTHON:-.venv/bin/python}" training/evaluate_student.py
+PY="${PYTHON:-.venv/bin/python}"
+
+# The untuned base model, scored the same way, is the "before" column.
+BASE_MODEL="${BASE_MODEL:-qwen2.5:3b-instruct}"
+if ! ollama list | grep -q "^${BASE_MODEL}"; then
+  echo "Pulling the untuned base model ($BASE_MODEL) for the before/after comparison..."
+  ollama pull "$BASE_MODEL"
+fi
+echo
+echo "Scoring the untuned base model on the held-out split (45 packets)..."
+PYTHONPATH=src:. "$PY" training/evaluate_student.py --model "$BASE_MODEL" --out training/data/base_eval.json
+
+echo
+echo "Scoring the fine-tuned student on the same packets..."
+PYTHONPATH=src:. "$PY" training/evaluate_student.py --out training/data/student_eval.json
 
 echo
 echo "To put the student in the product's briefing seat for a live session:"
