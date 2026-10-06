@@ -247,17 +247,14 @@ calibration corpora, which are third-party and fetched by script.
 The model has not been fine-tuned yet, so there is no training curve. What
 there is: five live evaluation checkpoints in which the prompts and the
 knowledge model were revised against the same personas and events, with the
-numbers recorded before and after each change. All four charts are drawn from
+numbers recorded before and after each change. All three charts are drawn from
 [docs/charts/data.json](docs/charts/data.json), which cites its sources, by
 [docs/charts/make_charts.py](docs/charts/make_charts.py).
 
-![Materiality precision, recall and F1 across checkpoints 1, 2 and 5](docs/charts/materiality-by-checkpoint.svg)
-
-Precision held at 0.97 throughout. Recall was 0.83 on the first run and
-0.94 on every run after. The materiality prompt did not change between
-checkpoints 1 and 2, so the decision log records that jump as run-to-run
-variation or label noise, not as an improvement; the point of the chart is
-that the judgment held steady while everything around it was rebuilt.
+Materiality agreement with the labelled events was 0.97 precision and 0.94
+recall across checkpoints 1, 2 and 5, with no change to that judgment's
+prompt. It is stated rather than charted because nothing moved: the point is
+that it held while everything around it was rebuilt.
 
 ![Ledger errors before and after checkpoint 2](docs/charts/ledger-before-after.svg)
 

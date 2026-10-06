@@ -124,5 +124,6 @@
    "definitions_per_100w_mean": 0.67,
    "domain_term_density_mean": 2.1
   }
- }
+ },
+ "materiality_by_checkpoint_note": "Stated in the README as text, not charted: precision 0.97 and recall 0.94 at checkpoints 2 and 5 (0.83 recall at checkpoint 1, attributed in docs/checkpoints.md to run variance or label noise; no prompt change)."
 }

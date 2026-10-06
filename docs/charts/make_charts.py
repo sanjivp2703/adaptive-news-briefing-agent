@@ -46,53 +46,6 @@ def heading(title: str, subtitle: str, width: int) -> list[str]:
     return [text(20, 28, title, size=16, weight="600"), text(20, 48, subtitle, fill=INK2)]
 
 
-# --- 1. Materiality across checkpoints ---------------------------------------
-
-
-def materiality_chart() -> str:
-    pts = DATA["materiality_by_checkpoint"]
-    width, height = 720, 340
-    left, right, top, bottom = 60, 560, 84, 262
-    body = heading(
-        "Materiality judgment across evaluation checkpoints",
-        "Agreement with labelled real events. Five hand-built personas, about 35 events per run.",
-        width,
-    )
-    ymin, ymax = 0.5, 1.0
-    def sx(i): return left + i * (right - left) / (len(pts) - 1)
-    def sy(v): return bottom - (v - ymin) / (ymax - ymin) * (bottom - top)
-    for v in (0.5, 0.6, 0.7, 0.8, 0.9, 1.0):
-        body.append(f'<line x1="{left}" x2="{right}" y1="{sy(v):.1f}" y2="{sy(v):.1f}" stroke="{GRID}"/>')
-        body.append(text(left - 8, sy(v) + 4, f"{v:.1f}", fill=INK2, anchor="end", size=11))
-    series = [("Precision", "precision"), ("Recall", "recall"), ("F1", "f1")]
-    for k, (_, key) in enumerate(series):
-        color = SERIES[k]
-        d = " ".join(f"{'M' if i == 0 else 'L'}{sx(i):.1f},{sy(p[key]):.1f}" for i, p in enumerate(pts))
-        body.append(f'<path d="{d}" fill="none" stroke="{color}" stroke-width="2" stroke-linejoin="round"/>')
-        for i, p in enumerate(pts):
-            body.append(f'<circle cx="{sx(i):.1f}" cy="{sy(p[key]):.1f}" r="4.5" fill="{color}" stroke="{SURFACE}" stroke-width="2"/>')
-    # Direct labels at the right edge, spread so they cannot collide.
-    ends = sorted(((pts[-1][key], name) for name, key in series), reverse=True)
-    y_prev = None
-    for value, name in ends:
-        y = sy(value) + 4
-        if y_prev is not None and y - y_prev < 15:
-            y = y_prev + 15
-        body.append(text(right + 12, y, f"{name} {value:.2f}", fill=INK, size=12))
-        y_prev = y
-    for i, p in enumerate(pts):
-        body.append(text(sx(i), bottom + 20, f"{p['checkpoint']} · {p['date'][5:]}", fill=INK, anchor="middle", size=12, weight="600"))
-        for j, line in enumerate(p["label"]):
-            body.append(text(sx(i), bottom + 36 + 14 * j, line, fill=INK2, anchor="middle", size=11))
-    lx = 420
-    for k, (name, _) in enumerate(series):
-        body.append(f'<rect x="{lx}" y="{top - 24}" width="14" height="3" rx="1.5" fill="{SERIES[k]}"/>')
-        body.append(text(lx + 20, top - 19, name, fill=INK2, size=12))
-        lx += 86
-    return svg(width, height, body, "Materiality judgment across evaluation checkpoints",
-               "Precision stays at 0.97; recall rises from 0.83 at checkpoint 1 to 0.94 at checkpoints 2 and 5; F1 from 0.89 to 0.96.")
-
-
 # --- 2. Ledger quality before and after checkpoint 2 --------------------------
 
 
@@ -200,7 +153,6 @@ def depth_chart() -> str:
 
 def main() -> None:
     out = {
-        "materiality-by-checkpoint.svg": materiality_chart(),
         "ledger-before-after.svg": ledger_before_after_chart(),
         "ledger-precision-by-state.svg": ledger_precision_chart(),
         "briefing-depth-by-profile.svg": depth_chart(),
