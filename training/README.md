@@ -243,6 +243,24 @@ came from — a row whose reasoning cannot be found is dropped, never invented),
 and an empty `subdomains` list for the few rows written under the older v5
 prompt, which never had one; `meta.backfilled` says which.
 
+### The short version
+
+1. Open the notebook straight from GitHub, no download needed:
+   https://colab.research.google.com/github/sanjivp2703/adaptive-news-briefing-agent/blob/main/training/notebooks/01_sft_colab.ipynb
+2. **Runtime → Change runtime type → T4 GPU → Save**, then **Runtime → Run all**.
+   The data is fetched from the project's GitHub release automatically. Say
+   yes when asked to connect Google Drive, so the finished model lands in
+   `MyDrive/news-briefer/`.
+3. When the GGUF file is in your Drive, run one command on your Mac:
+
+   ```bash
+   training/serve_student.sh ~/Library/CloudStorage/GoogleDrive-*/My\ Drive/news-briefer/news-briefer-q4_k_m.gguf
+   ```
+
+   It installs Ollama if needed, registers the model, scores it against the
+   teacher on the 45 held-out packets (`training/evaluate_student.py`), and
+   prints the two variables that put it in the product's briefing seat.
+
 ### Step by step on Colab
 
 1. Open [colab.research.google.com](https://colab.research.google.com),
@@ -252,9 +270,10 @@ prompt, which never had one; `meta.backfilled` says which.
 3. Run the cells in order, top to bottom (Shift+Enter on each, or
    **Runtime → Run all**). Every cell has a note above it saying what it does
    and what you should see.
-4. When the upload cell asks, choose both `sft_train.jsonl` and
-   `sft_val.jsonl` from `training/data/`. It also asks to connect your Google
-   Drive; say yes — see the next section for why.
+4. The data cell fetches `sft_train.jsonl` and `sft_val.jsonl` from the
+   GitHub release on its own, and asks to connect your Google Drive; say yes,
+   see the next section for why. If the download fails it offers an upload
+   button instead.
 5. The training cell is the long one, roughly an hour. Watch the two loss
    numbers: `loss` (on the training examples) and `eval_loss` (on the
    held-back ones). Both should fall and then flatten. The plot cell after it
