@@ -247,7 +247,7 @@ calibration corpora, which are third-party and fetched by script.
 The model has not been fine-tuned yet, so there is no training curve. What
 there is: five live evaluation checkpoints in which the prompts and the
 knowledge model were revised against the same personas and events, with the
-numbers recorded before and after each change. All three charts are drawn from
+numbers recorded before and after each change. Both charts are drawn from
 [docs/charts/data.json](docs/charts/data.json), which cites its sources, by
 [docs/charts/make_charts.py](docs/charts/make_charts.py).
 
@@ -272,13 +272,17 @@ ledger gets right by state. The weakest row is reported on purpose: a term
 glossed once in a skimmed briefing is usually still unknown, which is why
 that state is excluded from the proficiency band until a second read.
 
-![Briefing depth by reader profile in the teacher data](docs/charts/briefing-depth-by-profile.svg)
+The training set was checked for the property the student has to learn
+before any training was run. Across the 452 teacher briefings, grouped by
+the reader they were written for:
 
-The last chart is about the training data rather than a checkpoint. It shows
-that the briefing prompt, given the same events, writes measurably simpler
-prose with more definitions for a beginner and denser prose with almost none
-for an expert. That adaptation is what the local model is being trained to
-reproduce.
+- Beginners get grade-10 prose with 1.6 definitions per 100 words.
+- Experts get grade-12.8 prose with 0.5 definitions per 100 words.
+- A reader who is expert in one subdomain only lands in between on both.
+
+So the teacher adapts to the reader, and the data can teach that. Whether
+the student learns it is the first thing the fine-tune will be scored on;
+the numbers are in `docs/charts/data.json` for that comparison.
 
 **Caveats.** The samples are small, the materiality labels are the author's
 own, and no live run has yet passed the harness's ledger gate (precision 0.75

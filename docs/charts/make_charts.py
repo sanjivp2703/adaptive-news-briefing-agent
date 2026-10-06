@@ -107,55 +107,10 @@ def ledger_precision_chart() -> str:
                "unknown 22 of 23, confirmed 6 of 8, explained after two reads 2 of 3, familiar after two reads 2 of 3, explained after one read 2 of 8, provisional 2 of 9, familiar after one read 2 of 32.")
 
 
-# --- 4. Briefing depth by reader profile --------------------------------------
-
-
-def depth_chart() -> str:
-    prof = DATA["briefing_depth_by_reader_profile_v7"]
-    labels = {
-        "beginner": "Beginner",
-        "partial": "Partway in",
-        "expert_one_subdomain": "Expert in one area",
-        "expert": "Expert",
-        "returning_reader": "Returning reader",
-    }
-    width, height = 720, 330
-    body = heading(
-        "The same event, briefed for five kinds of reader (prompt v7, teacher data)",
-        f"Mean over {sum(v['n'] for v in prof.values())} generated briefings across 56 real events, grouped by the reader state the packet described.",
-        width,
-    )
-    panels = [("Reading grade level", "fk_grade_mean", "{:.1f}", SERIES[0]),
-              ("Definitions per 100 words", "definitions_per_100w_mean", "{:.2f}", SERIES[1])]
-    pw = 300
-    for pi, (title, key, fmt, color) in enumerate(panels):
-        px = 40 + pi * (pw + 60)
-        top, bottom = 100, 270
-        body.append(text(px, top - 14, title, fill=INK, size=12, weight="600"))
-        vals = [prof[k][key] for k in labels]
-        vmax = max(vals) * 1.15
-        bw = pw / len(labels) - 10
-        for i, k in enumerate(labels):
-            v = prof[k][key]
-            h = v / vmax * (bottom - top)
-            x = px + i * (pw / len(labels))
-            body.append(f'<rect x="{x:.1f}" y="{bottom - h:.1f}" width="{bw:.1f}" height="{h:.1f}" rx="3" fill="{color}"/>')
-            body.append(text(x + bw / 2, bottom - h - 6, fmt.format(v), fill=INK, anchor="middle", size=11))
-            words = labels[k].split(" ")
-            body.append(text(x + bw / 2, bottom + 16, " ".join(words[:2]), fill=INK2, anchor="middle", size=10))
-            if len(words) > 2:
-                body.append(text(x + bw / 2, bottom + 28, " ".join(words[2:]), fill=INK2, anchor="middle", size=10))
-        body.append(f'<line x1="{px}" x2="{px + pw}" y1="{bottom}" y2="{bottom}" stroke="{GRID}"/>')
-    body.append(text(20, 312, "Beginners get the simplest prose and the most definitions. Experts get denser prose and almost none.", fill=INK2, size=11))
-    return svg(width, height, body, "Briefing depth by reader profile",
-               "Reading grade level rises from about 10 for beginners to about 12.6 for experts, while definitions per 100 words fall from about 1.5 to about 0.45.")
-
-
 def main() -> None:
     out = {
         "ledger-before-after.svg": ledger_before_after_chart(),
         "ledger-precision-by-state.svg": ledger_precision_chart(),
-        "briefing-depth-by-profile.svg": depth_chart(),
     }
     for name, content in out.items():
         (HERE / name).write_text(content, encoding="utf-8")
