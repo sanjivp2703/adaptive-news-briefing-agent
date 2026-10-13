@@ -298,9 +298,9 @@ Do not run it on a CPU runtime — it would take days.
 Colab also disconnects free sessions after long inactivity or roughly twelve
 hours, and when it does its disk is wiped. The notebook guards against this in
 two ways: with Drive connected, it saves a checkpoint of the trained part to
-your Drive at the end of every epoch, and the training cell resumes from the
-newest checkpoint it finds there. So a disconnect costs you at most one
-epoch. To recover: reconnect, run the cells from the top again (the install
+your Drive every 25 steps (about every 12 minutes on a T4), and the training
+cell resumes from the newest checkpoint it finds there. So a disconnect costs
+you at most a few minutes. To recover: reconnect, run the cells from the top again (the install
 and upload steps repeat; the model download is quick), and the training cell
 picks up where it left off. Keep the browser tab open and the laptop awake
 while it trains.

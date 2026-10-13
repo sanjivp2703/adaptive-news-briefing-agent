@@ -38,3 +38,10 @@ The slice briefs described the pre-redesign quiz model and were removed on
 
 QA: not run (qa-tester has not been run on this project; the web app was verified live in a browser by the builder on 2026-10-05)
 Deploy: not deployed (local only; the web surface has no authentication)
+
+## Changes
+
+Post-v1 work, per `iteration-guide.md` (agent_pipeline root). One row per change folder or fix.
+
+| Change | Lane | Status | Notes |
+|--------|------|--------|-------|
