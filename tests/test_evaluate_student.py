@@ -55,20 +55,20 @@ def test_a_bad_student_fails_the_rules_it_breaks():
     answers = iter([
         "Sure! Here is the briefing: City won 2-1?",  # no JSON, and a question mark
     ])
-    report = ev.evaluate(rows, lambda messages: next(answers), progress=lambda _: None)
+    report = ev.evaluate(rows, lambda messages, rid: next(answers), progress=lambda _: None)
     result = report["results"][0]
     assert result["student"]["parsed"] is False
     assert result["student"]["checks"]["passed"] is False
     assert result["teacher"]["checks"]["passed"] is True
 
     invented = dict(TEACHER, briefing=TEACHER["briefing"] + " The fee was 300 million pounds.")
-    report = ev.evaluate(rows, lambda messages: json.dumps(invented), progress=lambda _: None)
+    report = ev.evaluate(rows, lambda messages, rid: json.dumps(invented), progress=lambda _: None)
     checks = report["results"][0]["student"]["checks"]
     assert checks["numbers_supported"] is False
     assert "300" in " ".join(checks["details"]["unsupported_numbers"])
 
     reglossed = dict(TEACHER, explained_terms=["offside", "var"])
-    report = ev.evaluate(rows, lambda messages: json.dumps(reglossed), progress=lambda _: None)
+    report = ev.evaluate(rows, lambda messages, rid: json.dumps(reglossed), progress=lambda _: None)
     assert report["results"][0]["student"]["checks"]["no_regloss"] is False
 
 
@@ -86,7 +86,7 @@ def test_the_local_student_sends_the_rows_own_messages_unchanged(monkeypatch):
     client = LocalModelClient(base_url="http://localhost:11434/v1", model="news-briefer", post=fake_post)
     student = ev.local_student(client)
     row = _row("beginner")
-    answer = student(row["messages"][:2])
+    answer = student(row["messages"][:2], "row-beginner")
     assert json.loads(answer)["topic"] == "Manchester derby"
     assert seen["url"].endswith("/chat/completions")
     assert seen["body"]["model"] == "news-briefer"
@@ -99,3 +99,17 @@ def test_the_summary_prints_both_columns():
     report = ev.evaluate(rows, ev.replay_student(rows), progress=lambda _: None)
     text = ev.format_summary(report["summary"], 1)
     assert "student | teacher" in text and "beginner" in text and "no_regloss" in text
+
+
+def test_answers_generated_elsewhere_are_scored_by_row_id(tmp_path):
+    rows = [_row("beginner"), _row("expert")]
+    answers = tmp_path / "answers.jsonl"
+    answers.write_text(
+        json.dumps({"id": "row-beginner", "answer": json.dumps(TEACHER)}) + "\n"
+        + json.dumps({"id": "row-expert", "answer": "not json at all"}) + "\n"
+    )
+    student = ev.answers_student(answers)
+    report = ev.evaluate(rows, student, progress=lambda _: None)
+    by_profile = {r["profile"]: r for r in report["results"]}
+    assert by_profile["beginner"]["student"]["checks"]["passed"] is True
+    assert by_profile["expert"]["student"]["parsed"] is False

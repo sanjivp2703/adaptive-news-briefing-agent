@@ -19,14 +19,18 @@ if [[ -z "$GGUF" || ! -f "$GGUF" ]]; then
   exit 2
 fi
 
+# Ollama: use an existing install, else fetch the official command-line build
+# into ~/.local/ollama. (Not Homebrew: on older macOS it compiles Ollama and
+# dozens of dependencies from source, which takes hours.)
+export PATH="$HOME/.local/bin:$PATH"
 if ! command -v ollama >/dev/null 2>&1; then
-  if command -v brew >/dev/null 2>&1; then
-    echo "Installing Ollama with Homebrew..."
-    brew install ollama
-  else
-    echo "Ollama is not installed and Homebrew is not available. Install it from https://ollama.com and re-run." >&2
-    exit 2
-  fi
+  echo "Installing the official Ollama build into ~/.local/ollama ..."
+  mkdir -p "$HOME/.local/ollama" "$HOME/.local/bin"
+  curl -fsSL -o "$HOME/.local/ollama/ollama-darwin.tgz" \
+    https://github.com/ollama/ollama/releases/latest/download/ollama-darwin.tgz
+  tar xzf "$HOME/.local/ollama/ollama-darwin.tgz" -C "$HOME/.local/ollama"
+  rm -f "$HOME/.local/ollama/ollama-darwin.tgz"
+  ln -sf "$HOME/.local/ollama/ollama" "$HOME/.local/bin/ollama"
 fi
 
 # Start the server if nothing is listening yet.

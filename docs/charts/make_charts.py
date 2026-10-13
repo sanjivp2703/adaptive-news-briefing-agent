@@ -107,10 +107,59 @@ def ledger_precision_chart() -> str:
                "unknown 22 of 23, confirmed 6 of 8, explained after two reads 2 of 3, familiar after two reads 2 of 3, explained after one read 2 of 8, provisional 2 of 9, familiar after one read 2 of 32.")
 
 
+# --- 4. Stage 1 training curve -------------------------------------------------
+
+
+def training_curve_chart() -> str:
+    rows = json.loads((HERE / "train_log.json").read_text(encoding="utf-8"))
+    train = [(r["step"], r["loss"]) for r in rows if "loss" in r]
+    val = [(r["step"], r["eval_loss"]) for r in rows if "eval_loss" in r]
+    max_step = max(s for s, _ in train)
+    epochs = 3
+    width, height = 720, 340
+    left, right, top, bottom = 60, 580, 84, 262
+    body = heading(
+        "Stage 1 fine-tuning: loss per step",
+        "Qwen2.5-3B-Instruct, LoRA r=16, 415 examples, 3 epochs on a Colab L4. Lower is better.",
+        width,
+    )
+    ymin, ymax = 0.0, 1.6
+    def sx(step): return left + step / max_step * (right - left)
+    def sy(v): return bottom - (v - ymin) / (ymax - ymin) * (bottom - top)
+    for v in (0.0, 0.4, 0.8, 1.2, 1.6):
+        body.append(f'<line x1="{left}" x2="{right}" y1="{sy(v):.1f}" y2="{sy(v):.1f}" stroke="{GRID}"/>')
+        body.append(text(left - 8, sy(v) + 4, f"{v:.1f}", fill=INK2, anchor="end", size=11))
+    for e in range(1, epochs):
+        x = sx(max_step * e / epochs)
+        body.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="{top}" y2="{bottom}" stroke="{GRID}" stroke-dasharray="4 4"/>')
+        body.append(text(x, top - 6, f"epoch {e} ends", fill=INK2, anchor="middle", size=10))
+    d = " ".join(f"{'M' if i == 0 else 'L'}{sx(s):.1f},{sy(v):.1f}" for i, (s, v) in enumerate(train))
+    body.append(f'<path d="{d}" fill="none" stroke="{SERIES[0]}" stroke-width="2" stroke-linejoin="round"/>')
+    d = " ".join(f"{'M' if i == 0 else 'L'}{sx(s):.1f},{sy(v):.1f}" for i, (s, v) in enumerate(val))
+    body.append(f'<path d="{d}" fill="none" stroke="{SERIES[1]}" stroke-width="2" stroke-linejoin="round"/>')
+    for s, v in val:
+        body.append(f'<circle cx="{sx(s):.1f}" cy="{sy(v):.1f}" r="4.5" fill="{SERIES[1]}" stroke="{SURFACE}" stroke-width="2"/>')
+    body.append(text(right + 10, sy(train[-1][1]) + 4, f"train {train[-1][1]:.2f}", fill=INK, size=12))
+    body.append(text(right + 10, sy(val[-1][1]) - 6, f"validation {val[-1][1]:.2f}", fill=INK, size=12))
+    for step in (0, 50, 100, 150):
+        body.append(text(sx(step), bottom + 18, str(step), fill=INK2, anchor="middle", size=11))
+    body.append(text((left + right) / 2, bottom + 36, "training step (8 examples each)", fill=INK2, anchor="middle", size=11))
+    lx = 400
+    for k, name in enumerate(("training loss", "validation loss")):
+        body.append(f'<rect x="{lx}" y="{top - 26}" width="14" height="3" rx="1.5" fill="{SERIES[k]}"/>')
+        body.append(text(lx + 20, top - 21, name, fill=INK2, size=12))
+        lx += 120
+    best = min(val, key=lambda p: p[1])
+    body.append(text(20, 312, f"Training loss {train[0][1]:.2f} to {train[-1][1]:.2f}; validation loss {val[0][1]:.2f} to {val[-1][1]:.2f}, lowest {best[1]:.2f} at step {best[0]}. It flattens rather than rising: no sign of memorising.", fill=INK2, size=11))
+    return svg(width, height, body, "Stage 1 fine-tuning loss per step",
+               f"Training loss falls from {train[0][1]:.2f} to {train[-1][1]:.2f}; validation loss from {val[0][1]:.2f} to {val[-1][1]:.2f} and flattens after step 100.")
+
+
 def main() -> None:
     out = {
         "ledger-before-after.svg": ledger_before_after_chart(),
         "ledger-precision-by-state.svg": ledger_precision_chart(),
+        "training-curve.svg": training_curve_chart(),
     }
     for name, content in out.items():
         (HERE / name).write_text(content, encoding="utf-8")

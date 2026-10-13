@@ -49,8 +49,8 @@ RULES = (
 PROFILES = ("beginner", "partial", "expert_one_subdomain", "expert", "returning_reader", "real")
 PLAINNESS_FIELDS = ("fk_grade", "definitions_per_100w", "domain_term_density")
 
-Student = Callable[[list[dict[str, str]]], str]
-"""Takes the chat messages (system, user) and returns the raw answer text."""
+Student = Callable[[list[dict[str, str]], str | None], str]
+"""Takes the chat messages (system, user) and the row id; returns the raw answer text."""
 
 
 # --- Rows ----------------------------------------------------------------------
@@ -129,7 +129,7 @@ def evaluate(
         packet = packet_of(row)
         group = row["meta"].get("group_family") or "?"
         t0 = time.monotonic()
-        raw = student(row["messages"][:2])
+        raw = student(row["messages"][:2], row["meta"].get("id"))
         seconds = round(time.monotonic() - t0, 2)
         teacher_output = parse_answer(row["messages"][2]["content"])
         results.append(
@@ -204,7 +204,7 @@ def local_student(client: LocalModelClient, max_tokens: int = 1200) -> Student:
     endpoint. Not `complete_json`: that would append the schema tail a second
     time, and the training rows already contain it."""
 
-    def ask(messages: list[dict[str, str]]) -> str:
+    def ask(messages: list[dict[str, str]], row_id: str | None = None) -> str:
         body = {
             "model": client.model,
             "messages": messages,
@@ -224,14 +224,35 @@ def local_student(client: LocalModelClient, max_tokens: int = 1200) -> Student:
     return ask
 
 
+def answers_student(path: Path) -> Student:
+    """Replay answers generated elsewhere (for instance on a Colab GPU by
+    `training/notebooks/02_generate_eval_answers.ipynb`): one JSON object per
+    line with `id` (the row's meta id) and `answer` (the raw model text)."""
+    by_id: dict[str, str] = {}
+    with path.open(encoding="utf-8") as fh:
+        for line in fh:
+            if line.strip():
+                rec = json.loads(line)
+                by_id[rec["id"]] = rec.get("answer") or ""
+
+    def ask(messages: list[dict[str, str]], row_id: str | None = None) -> str:
+        if row_id not in by_id:
+            raise RuntimeError(
+                f"no generated answer for row {row_id!r}; regenerate with the current validation file"
+            )
+        return by_id[row_id]
+
+    return ask
+
+
 def replay_student(rows: list[dict[str, Any]]) -> Student:
     """Offline stand-in: answers every packet with the teacher's own answer, so
     the pipeline can be exercised and the student columns should equal the
     teacher columns exactly."""
-    answers = {row["messages"][1]["content"]: row["messages"][2]["content"] for row in rows}
+    answers = {row["meta"].get("id"): row["messages"][2]["content"] for row in rows}
 
-    def ask(messages: list[dict[str, str]]) -> str:
-        return answers[messages[1]["content"]]
+    def ask(messages: list[dict[str, str]], row_id: str | None = None) -> str:
+        return answers[row_id]
 
     return ask
 
@@ -245,6 +266,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="where to write the full results")
     parser.add_argument("--limit", type=int, default=None, help="score only the first N rows")
     parser.add_argument("--offline", action="store_true", help="replay the teacher as the student; no server needed")
+    parser.add_argument("--answers", type=Path, default=None,
+                        help="score answers generated elsewhere (JSONL of id + answer) instead of calling a server")
+    parser.add_argument("--label", default=None, help="name for the scored model in the output")
     parser.add_argument("--max-tokens", type=int, default=1200)
     parser.add_argument("--model", default=None,
                         help="served model name to score instead of $LOCAL_MODEL_NAME, e.g. the untuned base model")
@@ -260,6 +284,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.offline:
         student = replay_student(rows)
         label = "offline replay of the teacher"
+    elif args.answers:
+        student = answers_student(args.answers)
+        label = args.label or f"answers from {args.answers.name}"
     else:
         if not os.environ.get(config.LOCAL_MODEL_BASE_URL_ENV):
             print(
@@ -270,7 +297,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         client = LocalModelClient(model=args.model)
         student = local_student(client, max_tokens=args.max_tokens)
-        label = f"{client.model} at {client.base_url}"
+        label = args.label or f"{client.model} at {client.base_url}"
 
     print(f"Scoring {len(rows)} held-out packets against {label}")
     report = evaluate(rows, student)
