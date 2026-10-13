@@ -155,11 +155,95 @@ def training_curve_chart() -> str:
                f"Training loss falls from {train[0][1]:.2f} to {train[-1][1]:.2f}; validation loss from {val[0][1]:.2f} to {val[-1][1]:.2f} and flattens after step 100.")
 
 
+# --- 5. Stage 1: hard rules, before and after -----------------------------------
+
+
+def stage1_rules_chart() -> str:
+    d = DATA["stage1_hard_rules"]
+    n = d["n"]
+    models = [("untuned base", "#b9b6ad"), ("fine-tuned student", SERIES[0]), ("teacher (Claude Sonnet)", SERIES[1])]
+    rules = d["rules"]
+    width, height = 720, 400
+    left, right, top, bottom = 230, 640, 84, 350
+    body = heading(
+        "Stage 1: hard rules passed on the 45 held-out packets",
+        "Same packets, same checks the training data was filtered with. Untuned model vs fine-tuned vs the teacher.",
+        width,
+    )
+    for v in (0, 15, 30, 45):
+        x = left + v / n * (right - left)
+        body.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="{top - 6}" y2="{bottom}" stroke="{GRID}"/>')
+        body.append(text(x, top - 10, f"{v}/{n}", fill=INK2, anchor="middle", size=11))
+    gap = (bottom - top) / len(rules)
+    for i, (label, key) in enumerate(rules):
+        y0 = top + gap * i + 4
+        body.append(text(left - 12, y0 + 15, label, fill=INK, anchor="end", size=12, weight="600" if key == "all" else "normal"))
+        for k, (name, color) in enumerate(models):
+            v = d[name][key]
+            w = max(v / n * (right - left), 2)
+            y = y0 + k * 9
+            body.append(f'<rect x="{left}" y="{y:.1f}" width="{w:.1f}" height="7" rx="2" fill="{color}"/>')
+            if key == "all" or k == 1:
+                body.append(text(left + w + 6, y + 7, str(v), fill=INK2, size=10))
+    lx = left
+    for name, color in models:
+        body.append(f'<rect x="{lx}" y="{bottom + 14}" width="12" height="7" rx="2" fill="{color}"/>')
+        body.append(text(lx + 18, bottom + 21, name, fill=INK2, size=11))
+        lx += 150 if name != "untuned base" else 110
+    base, stu = d["untuned base"]["all"], d["fine-tuned student"]["all"]
+    body.append(text(20, bottom + 42, f"All rules at once: {base} of {n} before fine-tuning, {stu} of {n} after; the teacher's answers pass {n} of {n} by construction.", fill=INK2, size=11))
+    return svg(width, height, body, "Stage 1 hard rules before and after fine-tuning",
+               f"On 45 held-out packets the untuned model passes every rule on {base}, the fine-tuned student on {stu}, the teacher on {n}.")
+
+
+def stage1_definitions_chart() -> str:
+    d = DATA["stage1_definitions_by_profile"]
+    labels = {"beginner": "Beginner", "partial": "Partway in", "expert_one_subdomain": "Expert in one area", "expert": "Expert", "returning_reader": "Returning reader"}
+    models = [("untuned base", "#b9b6ad"), ("fine-tuned student", SERIES[0]), ("teacher", SERIES[1])]
+    width, height = 720, 340
+    left, right, top, bottom = 60, 690, 90, 262
+    body = heading(
+        "Stage 1: definitions per 100 words, by reader profile",
+        "How often each model stops to define a term. The teacher defines most for beginners and least for experts.",
+        width,
+    )
+    vmax = max(d[p][m] for p in d for m, _ in models) * 1.1
+    def sy(v): return bottom - v / vmax * (bottom - top)
+    for v in (0, 2, 4):
+        if v <= vmax:
+            body.append(f'<line x1="{left}" x2="{right}" y1="{sy(v):.1f}" y2="{sy(v):.1f}" stroke="{GRID}"/>')
+            body.append(text(left - 8, sy(v) + 4, str(v), fill=INK2, anchor="end", size=11))
+    group_w = (right - left) / len(labels)
+    bar_w = (group_w - 24) / len(models)
+    for i, (p, label) in enumerate(labels.items()):
+        gx = left + i * group_w + 12
+        for k, (m, color) in enumerate(models):
+            v = d[p][m]
+            x = gx + k * bar_w
+            h = v / vmax * (bottom - top)
+            body.append(f'<rect x="{x:.1f}" y="{bottom - h:.1f}" width="{bar_w - 2:.1f}" height="{h:.1f}" rx="2" fill="{color}"/>')
+            body.append(text(x + (bar_w - 2) / 2, bottom - h - 4, f"{v:.1f}", fill=INK2, anchor="middle", size=9))
+        words = label.split(" ")
+        body.append(text(gx + (group_w - 24) / 2, bottom + 16, " ".join(words[:2]), fill=INK2, anchor="middle", size=10))
+        if len(words) > 2:
+            body.append(text(gx + (group_w - 24) / 2, bottom + 28, " ".join(words[2:]), fill=INK2, anchor="middle", size=10))
+    lx = 330
+    for m, color in models:
+        body.append(f'<rect x="{lx}" y="{top - 26}" width="12" height="7" rx="2" fill="{color}"/>')
+        body.append(text(lx + 18, top - 19, m, fill=INK2, size=11))
+        lx += 125
+    body.append(text(20, 312, "The untuned model over-defines, most of all for experts. The student learned the no-gloss rule and now under-defines for every profile, most of all partway in.", fill=INK2, size=11))
+    return svg(width, height, body, "Definitions per 100 words by reader profile, three models",
+               "The untuned base defines far more than the teacher for every profile; the fine-tuned student defines less than the teacher for every profile.")
+
+
 def main() -> None:
     out = {
         "ledger-before-after.svg": ledger_before_after_chart(),
         "ledger-precision-by-state.svg": ledger_precision_chart(),
         "training-curve.svg": training_curve_chart(),
+        "stage1-hard-rules.svg": stage1_rules_chart(),
+        "stage1-definitions.svg": stage1_definitions_chart(),
     }
     for name, content in out.items():
         (HERE / name).write_text(content, encoding="utf-8")

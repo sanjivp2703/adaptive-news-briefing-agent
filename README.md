@@ -247,8 +247,9 @@ calibration corpora, which are third-party and fetched by script.
 The model has not been fine-tuned yet, so there is no training curve. What
 there is: five live evaluation checkpoints in which the prompts and the
 knowledge model were revised against the same personas and events, with the
-numbers recorded before and after each change. Both charts are drawn from
-[docs/charts/data.json](docs/charts/data.json), which cites its sources, by
+numbers recorded before and after each change. All charts are drawn from
+[docs/charts/data.json](docs/charts/data.json) and the saved training log,
+which cite their sources, by
 [docs/charts/make_charts.py](docs/charts/make_charts.py).
 
 Materiality agreement with the labelled events was 0.97 precision and 0.94
@@ -280,9 +281,37 @@ the reader they were written for:
 - Experts get grade-12.8 prose with 0.5 definitions per 100 words.
 - A reader who is expert in one subdomain only lands in between on both.
 
-So the teacher adapts to the reader, and the data can teach that. Whether
-the student learns it is the first thing the fine-tune will be scored on;
-the numbers are in `docs/charts/data.json` for that comparison.
+So the teacher adapts to the reader, and the data can teach that.
+
+### Stage 1 fine-tuning, measured
+
+The first training stage has run: a LoRA adapter on Qwen2.5-3B-Instruct,
+three epochs over the 415 training examples on a Colab L4. Three charts, all
+from the saved logs and the scorer in `training/evaluate_student.py`.
+
+![Training and validation loss per step during Stage 1](docs/charts/training-curve.svg)
+
+Training loss fell from 1.45 to 0.41 and validation loss from 0.87 to 0.69,
+then flattened rather than rising. The model learned the pattern without
+memorising the examples.
+
+![Hard rules passed on the held-out packets: untuned base, fine-tuned student, teacher](docs/charts/stage1-hard-rules.svg)
+
+The before-and-after. On the 45 held-out packets, scored with the same hard
+rules the training data was filtered with, the untuned model passes all of
+them on 30 and the fine-tuned student on 40. The two biggest gains are
+returning valid JSON every time (42 to 45) and not re-defining a term the
+reader already has (34 to 42). The five remaining failures are three
+re-glossed terms and two numbers not in the source.
+
+![Definitions per 100 words by reader profile, three models](docs/charts/stage1-definitions.svg)
+
+The gap that remains. The untuned model defines far too much, most of all
+for experts. The student over-learned the no-gloss rule and now defines less
+than the teacher for every profile, worst for readers partway in, and a
+third less for beginners, who need the definitions most. That is the kind of error a preference stage can correct:
+DPO pairs can reward a beginner briefing that defines more, not just one
+that breaks no rule.
 
 **Caveats.** The samples are small, the materiality labels are the author's
 own, and no live run has yet passed the harness's ledger gate (precision 0.75
@@ -298,9 +327,9 @@ writer; the yardstick is the same harness.
 | Stage | Method | State |
 |---|---|---|
 | Data | Distillation set: Claude writes briefings for synthetic reader states over 56 real events | **Done.** 500 generated, 452 pass automated faithfulness checks, split 415 / 45 |
-| 1 | Supervised fine-tuning of Qwen2.5-3B-Instruct with a LoRA adapter | Notebook written (`training/notebooks/01_sft_colab.ipynb`); **not yet run** |
+| 1 | Supervised fine-tuning of Qwen2.5-3B-Instruct with a LoRA adapter | **Done** 2026-10-13 on a Colab L4. Validation loss 0.87 to 0.69. On the 45 held-out packets, the fine-tuned model passes every hard rule on 40, against 30 for the untuned model and 45 for Claude. Charts below. |
 | Serving | Local model in the briefing seat via an OpenAI-compatible endpoint | **Done** and tested (`LOCAL_MODEL_*` variables) |
-| 2 | DPO on preference pairs ranked by the gate's rules, then a Claude judge | Planned; no code yet |
+| 2 | DPO on preference pairs ranked by the gate's rules, then a Claude judge | Next; no code yet |
 | 3 | RLAIF: a reward model trained on Claude's preferences, optimised with GRPO, the gate as guardrail | Planned; no code yet |
 
 See [training/README.md](training/README.md).
@@ -314,7 +343,8 @@ See [training/README.md](training/README.md).
 - Two interfaces over the same code: a web app and a CLI.
 - Tracing and the console.
 - The evaluation harness, the gate, the proposer, 21 personas.
-- The distillation data pipeline and local-model routing.
+- The distillation data pipeline, local-model routing, and the Stage 1
+  fine-tuned model with its measured before-and-after.
 - An offline test suite (see [Running it](#running-it)) and CI.
 
 **Known weaknesses**
@@ -340,9 +370,10 @@ See [training/README.md](training/README.md).
 
 **Not done**
 
-1. Run the Stage 1 fine-tune and score the student against Claude on the
-   harness.
-2. Stages 2 and 3 of the training track.
+1. Put the Stage 1 student in the briefing seat for a live harness run and
+   score the ledger it produces, not just its briefings.
+2. Stages 2 and 3 of the training track, starting with DPO pairs that
+   target the under-definition the Stage 1 measurement found.
 3. A scored live run over all 21 personas on the current prompts, to
    establish a baseline for the gate.
 4. Authentication and hosting. The web app is single-machine, binds to

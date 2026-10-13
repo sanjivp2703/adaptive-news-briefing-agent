@@ -12,11 +12,14 @@ product works today.
 | Distillation data: 500 teacher briefings generated, 452 pass the automated checks | done |
 | Packaging: 415 train / 45 validation, stratified by reader profile | done |
 | Local-model seat in the product (`LOCAL_MODEL_*`) | done, tested |
-| Stage 1: LoRA fine-tune of Qwen2.5-3B-Instruct (`notebooks/01_sft_colab.ipynb`) | written, **not yet run** |
+| Stage 1: LoRA fine-tune of Qwen2.5-3B-Instruct (`notebooks/01_sft_colab.ipynb`) | **done** 2026-10-13; validation loss 0.87 to 0.69 |
+| Stage 1 scoring on the 45 held-out packets (`notebooks/02_generate_eval_answers.ipynb` + `evaluate_student.py`) | **done**: all hard rules pass on 40 of 45, from 30 untuned; teacher 45 |
 | Stage 2: DPO on preference pairs | planned, no code |
 | Stage 3: RLAIF (reward model + GRPO, the regression gate as guardrail) | planned, no code |
 
-No trained-model result exists yet, so none is reported here.
+The Stage 1 results and charts are in the top-level README under
+"Stage 1 fine-tuning, measured". The scorer's full output is
+`training/data/student_eval.json` and `base_eval.json` (not checked in).
 
 The rest of this page is written for someone new to fine-tuning. Technical
 names are in brackets the first time they appear. The data files it describes
