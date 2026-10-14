@@ -14,7 +14,7 @@ product works today.
 | Local-model seat in the product (`LOCAL_MODEL_*`) | done, tested |
 | Stage 1: LoRA fine-tune of Qwen2.5-3B-Instruct (`notebooks/01_sft_colab.ipynb`) | **done** 2026-10-13; validation loss 0.87 to 0.69 |
 | Stage 1 scoring on the 45 held-out packets (`notebooks/02_generate_eval_answers.ipynb` + `evaluate_student.py`) | **done**: all hard rules pass on 40 of 45, from 30 untuned; teacher 45 |
-| Stage 2: DPO on preference pairs | planned, no code |
+| Stage 2: DPO on preference pairs (`notebooks/03_generate_dpo_candidates.ipynb` → `rank_pairs.py` → `notebooks/04_dpo_colab.ipynb`) | built; not yet run |
 | Stage 3: RLAIF (reward model + GRPO, the regression gate as guardrail) | planned, no code |
 
 The Stage 1 results and charts are in the top-level README under
@@ -334,3 +334,32 @@ interest, label ~100 pairs by hand and compare the two reward models; that
 is an afternoon, not a stage. The product does not depend on any of this;
 the demo app runs on Claude, with the local model as an optional toggle in
 the briefing seat once stage 1 has produced a GGUF.
+
+## Stage 2: preference training (DPO)
+
+Stage 1 taught the model to copy the teacher. The measurement afterwards
+showed it over-learned one rule: it defines fewer terms than the teacher for
+every reader profile. Stage 2 teaches a comparison instead of a copy.
+
+1. **Candidates** (`notebooks/03_generate_dpo_candidates.ipynb`, Colab): the
+   stage 1 model writes two briefings per training packet at temperature
+   0.8, so the pair differs. Output `candidates.jsonl`.
+2. **Ranking** (`rank_pairs.py`, local, about $5 to $15 of judge calls):
+   the hard rules decide first; a candidate that invents a number or
+   re-glosses a known term loses outright, and a pair where both fail is
+   dropped. Where both pass, a Claude judge picks against a rubric that
+   names the stage 1 fault (too few definitions for readers who lack the
+   terms). The judge is asked twice with the order swapped, and a pair it
+   decides differently is thrown out as position bias. Output
+   `dpo_pairs.jsonl`: prompt, chosen, rejected, who decided and why.
+3. **Training** (`notebooks/04_dpo_colab.ipynb`, Colab): one more LoRA pass
+   over the stage 1 adapter with the DPO loss, the stage 1 model as the
+   frozen reference, beta 0.1. Output `news-briefer-dpo-lora`.
+4. **Scoring**: `notebooks/02_generate_eval_answers.ipynb` with
+   `ADAPTER_NAME = "news-briefer-dpo-lora"`, then `evaluate_student.py
+   --answers dpo_answers.jsonl`. Same 45 packets, same rules, same charts,
+   so stage 2 becomes a third column next to stage 1 and the untuned base.
+
+The judge's preferences are checked against the personas on a sample of
+pairs before the stage 2 result is trusted: a briefing the judge preferred
+should also be the one a simulated reader learns more from.
