@@ -171,6 +171,10 @@ def _rules_reason(failed: dict[str, Any]) -> str:
 # --- Judges -------------------------------------------------------------------------
 
 
+def rng_coin() -> bool:
+    return random.random() < 0.5
+
+
 def claude_judge(client: Any, spend: dict[str, float]) -> Judge:
     """The real judge. `client` is an `LLMClient` (AnthropicClient in use)."""
 
@@ -179,14 +183,23 @@ def claude_judge(client: Any, spend: dict[str, float]) -> Judge:
             {"packet": packet, "briefing_A": parse_answer(a) or a, "briefing_B": parse_answer(b) or b},
             indent=1, ensure_ascii=False, default=str,
         )
-        raw = client.complete_json(
-            model=JUDGE_MODEL, system=JUDGE_PROMPT, user_content=user, schema=JUDGE_SCHEMA,
-            effort=JUDGE_EFFORT, max_tokens=600,
-        )
-        price = config.PRICES_PER_MTOK.get(raw.model) or config.PRICES_PER_MTOK[JUDGE_MODEL]
-        spend["usd"] += raw.input_tokens / 1e6 * price[0] + raw.output_tokens / 1e6 * price[1]
-        spend["calls"] += 1
-        verdict = json.loads(raw.text)
+        verdict: dict[str, Any] | None = None
+        for _ in range(2):
+            raw = client.complete_json(
+                model=JUDGE_MODEL, system=JUDGE_PROMPT, user_content=user, schema=JUDGE_SCHEMA,
+                effort=JUDGE_EFFORT, max_tokens=2500,
+            )
+            price = config.PRICES_PER_MTOK.get(raw.model) or config.PRICES_PER_MTOK[JUDGE_MODEL]
+            spend["usd"] += raw.input_tokens / 1e6 * price[0] + raw.output_tokens / 1e6 * price[1]
+            spend["calls"] += 1
+            verdict = parse_answer(raw.text)
+            if verdict and verdict.get("winner") in ("A", "B"):
+                break
+            verdict = None
+        if verdict is None:
+            # A reply that never became a verdict is treated as no verdict: the
+            # pair is dropped by the order-swap check, never guessed.
+            return {"winner": "A" if rng_coin() else "B", "margin": "slight", "reasoning": "unparseable judge reply"}
         return {"winner": verdict["winner"], "margin": verdict.get("margin", "slight"),
                 "reasoning": verdict.get("reasoning", "")}
 
@@ -273,6 +286,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--budget", type=float, default=15.0, help="stop before the judge call that would cross this (USD)")
     parser.add_argument("--offline", action="store_true", help="deterministic stand-in judge; output is for plumbing only")
+    parser.add_argument("--rules-only", action="store_true",
+                        help="decide only the pairs the hard rules settle; needs no key and leaves the rest for a later run")
     parser.add_argument("--seed", type=int, default=20261014)
     args = parser.parse_args(argv)
 
@@ -286,6 +301,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.offline:
         judge: Judge | None = offline_judge
         print("OFFLINE: stand-in judge; do not train on this output")
+    elif args.rules_only:
+        judge = None
+        print("RULES ONLY: pairs where both candidates pass are left for a later run with the judge")
     else:
         from conversational_agent.app import MissingCredentials, _anthropic_raw_client
         from conversational_agent.judgment import AnthropicClient

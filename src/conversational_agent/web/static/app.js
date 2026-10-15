@@ -435,7 +435,7 @@ function svgMark() {
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox', '0 0 16 16');
   const path = document.createElementNS(ns, 'path');
-  path.setAttribute('d', 'M2.5 4h11M2.5 8h11M2.5 12h6.5'); path.setAttribute('stroke', '#fff');
+  path.setAttribute('d', 'M2.5 4h11M2.5 8h11M2.5 12h6.5'); path.setAttribute('stroke', '#00130a');
   path.setAttribute('stroke-width', '1.8'); path.setAttribute('stroke-linecap', 'round'); path.setAttribute('fill', 'none');
   svg.append(path); return svg;
 }
