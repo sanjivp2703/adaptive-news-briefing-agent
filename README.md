@@ -306,12 +306,39 @@ re-glossed terms and two numbers not in the source.
 
 ![Definitions per 100 words by reader profile, three models](docs/charts/stage1-definitions.svg)
 
-The gap that remains. The untuned model defines far too much, most of all
-for experts. The student over-learned the no-gloss rule and now defines less
-than the teacher for every profile, worst for readers partway in, and a
-third less for beginners, who need the definitions most. That is the kind of error a preference stage can correct:
-DPO pairs can reward a beginner briefing that defines more, not just one
-that breaks no rule.
+The gap that remains after Stage 1. The untuned model defines far too much,
+most of all for experts. The Stage 1 student over-learned the no-gloss rule
+and defines less than the teacher for every profile. The first DPO pass,
+below, made that worse.
+
+### Stage 2, first pass: a proxy the model satisfied by defining nothing
+
+Stage 2 trains on preference pairs instead of single answers. The Stage 1
+model wrote two briefings for each of the 415 training packets; the hard
+rules decided a pair where one candidate broke a rule, and a Claude judge
+decided the rest, asked twice with the order swapped and dropped when it
+flipped. That gave 330 pairs, and a DPO pass over them produced a model that
+passes 44 of 45 hard rules on the held-out packets and defines nothing for
+anyone: 0.16 definitions per 100 words for beginners, 0.0 for every other
+profile, where the teacher writes 1.5 and 0.5.
+
+The cause was in the pairs, and it was measurable before training. The most
+common rule break was re-glossing a known term, so in 55 of the 90
+rules-decided pairs the rejected briefing was the one that defined more.
+Across the whole set the chosen briefing averaged 0.26 definitions and the
+rejected 0.41. The model learned exactly that preference. A check against
+the harness's simulated reader had already flagged it: on rules-decided
+pairs, the reader learned more from the *rejected* briefing 19 times out of
+27 it could tell apart.
+
+The second pair set fixes the construction rather than the model. Rule
+breakers are paired against the teacher's briefing for that packet, not
+against the other candidate, so the signal is "this is right", never "fewer
+definitions". Pairs the judge decided are kept. And the simulated reader
+adds pairs of its own: where the teacher's briefing teaches it clearly more
+than a candidate, that pair is added. The result, 484 pairs, leans the other
+way, chosen 0.93 definitions against rejected 0.37, with the teacher's
+briefings anchoring what "enough" means. The second pass trains on that.
 
 **Caveats.** The samples are small, the materiality labels are the author's
 own, and no live run has yet passed the harness's ledger gate (precision 0.75
@@ -329,7 +356,7 @@ writer; the yardstick is the same harness.
 | Data | Distillation set: Claude writes briefings for synthetic reader states over 56 real events | **Done.** 500 generated, 452 pass automated faithfulness checks, split 415 / 45 |
 | 1 | Supervised fine-tuning of Qwen2.5-3B-Instruct with a LoRA adapter | **Done** 2026-10-13 on a Colab L4. Validation loss 0.87 to 0.69. On the 45 held-out packets, the fine-tuned model passes every hard rule on 40, against 30 for the untuned model and 45 for Claude. Charts below. |
 | Serving | Local model in the briefing seat via an OpenAI-compatible endpoint | **Done** and tested (`LOCAL_MODEL_*` variables) |
-| 2 | DPO on preference pairs ranked by the gate's rules, then a Claude judge | Next; no code yet |
+| 2 | DPO on preference pairs ranked by the gate's rules, then a Claude judge | First pass run 2026-10-16: 44 of 45 on the rules, but the pair set leaned toward fewer definitions and the model stopped defining. Pair set rebuilt against the teacher; second pass next. |
 | 3 | RLAIF: a reward model trained on Claude's preferences, optimised with GRPO, the gate as guardrail | Planned; no code yet |
 
 See [training/README.md](training/README.md).
@@ -372,8 +399,7 @@ See [training/README.md](training/README.md).
 
 1. Put the Stage 1 student in the briefing seat for a live harness run and
    score the ledger it produces, not just its briefings.
-2. Stages 2 and 3 of the training track, starting with DPO pairs that
-   target the under-definition the Stage 1 measurement found.
+2. The second DPO pass on the corrected pair set, then Stage 3.
 3. A scored live run over all 21 personas on the current prompts, to
    establish a baseline for the gate.
 4. Authentication and hosting. The web app is single-machine, binds to
