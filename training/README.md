@@ -363,3 +363,46 @@ every reader profile. Stage 2 teaches a comparison instead of a copy.
 The judge's preferences are checked against the personas on a sample of
 pairs before the stage 2 result is trusted: a briefing the judge preferred
 should also be the one a simulated reader learns more from.
+
+## Stage 3: past the teacher, by instruments that are not the teacher
+
+Decided 2026-10-16. From here Claude writes no more training targets. The
+end goal is a student that scores better than Claude's recorded briefings
+on measures that do not use Claude's text, and that the live persona
+harness prefers in the briefing seat.
+
+**The reward** (`reward.py`), all by code:
+
+1. The hard rules. Break one and the briefing scores zero.
+2. Reader learning, from the harness's memory model seeded in the packet's
+   state, with un-ledgered terms held with probability equal to the
+   reader's familiarity with their subdomain. Gain is coverage of the
+   lacking terms; defining a term the reader probably held is a cost. This
+   is what catches an expert being talked down to.
+3. Fit: readability band and length targets per proficiency, from
+   plain-language guidance, not from the teacher's averages.
+
+**Each round** (`notebooks/05_generate_round_candidates.ipynb` →
+`build_pairs_v3.py` → `notebooks/04_dpo_colab.ipynb` → score): the current
+student writes four briefings per packet; every candidate is scored; the
+best and worst per packet become a DPO pair, with a Claude judge breaking
+only near-ties between two student briefings; one more DPO pass; the same
+45 held-out packets. Rejection-sampling DPO, two or three rounds. The gate
+runs after every round so a gamed reward is caught the way the first pass
+was.
+
+**How "better than Claude" is decided** (`compare_vs_claude.py`):
+
+- The reward's measurable components, scored for the student and for
+  Claude's recorded briefings on the same 45 packets. Claude is measured,
+  never used as the target.
+- A blind head-to-head: the Claude judge, order-swapped, between a student
+  briefing and Claude's for the same packet. A win rate above 50% means the
+  judge prefers the student's writing to Claude's.
+- The live persona harness with the student in the briefing seat against a
+  run with Claude in it: ledger precision and recall, re-ask rate,
+  elicitation. The personas judging by outcome; the number to quote.
+
+Honest limits: the simulated reader scores what was defined, not how well;
+"better" means on this task by these instruments. Real readers remain the
+stronger claim, and the product already logs what that would need.

@@ -384,7 +384,7 @@ writer; the yardstick is the same harness.
 | 1 | Supervised fine-tuning of Qwen2.5-3B-Instruct with a LoRA adapter | **Done** 2026-10-13 on a Colab L4. Validation loss 0.87 to 0.69. On the 45 held-out packets, the fine-tuned model passes every hard rule on 40, against 30 for the untuned model and 45 for Claude. Charts below. |
 | Serving | Local model in the briefing seat via an OpenAI-compatible endpoint | **Done** and tested (`LOCAL_MODEL_*` variables) |
 | 2 | DPO on preference pairs ranked by the gate's rules, then a Claude judge | **Two passes run 2026-10-16.** First pass: 44 of 45 on the rules but defined nothing, from a pair set that leaned toward fewer definitions. Second pass on teacher-anchored pairs: 40 of 45 on the rules, definitions back to the teacher's rate for beginners, still none for experts. |
-| 3 | RLAIF: a reward model trained on Claude's preferences, optimised with GRPO, the gate as guardrail | Planned; no code yet |
+| 3 | Past the teacher: rejection-sampling DPO against a code-computed reward (hard rules, the personas' simulated reader, fit to the reader), Claude only as a judge between student briefings, never as the target. Scored against Claude's briefings and in the live persona harness. | Reward and pipeline being built; see `training/README.md` |
 
 See [training/README.md](training/README.md).
 
