@@ -338,7 +338,34 @@ definitions". Pairs the judge decided are kept. And the simulated reader
 adds pairs of its own: where the teacher's briefing teaches it clearly more
 than a candidate, that pair is added. The result, 484 pairs, leans the other
 way, chosen 0.93 definitions against rejected 0.37, with the teacher's
-briefings anchoring what "enough" means. The second pass trains on that.
+briefings anchoring what "enough" means. The second pass trained on that.
+
+### Stage 2, second pass: the definitions come back
+
+Trained on the 484 teacher-anchored pairs, scored on the same 45 packets:
+
+| | Untuned | Stage 1 | DPO, first pass | DPO, second pass | Claude |
+|---|---|---|---|---|---|
+| All hard rules passed | 30 | 40 | 44 | 40 | 45 |
+| Definitions per 100 words, beginners | 3.6 | 1.0 | 0.2 | 1.4 | 1.5 |
+| Definitions per 100 words, partway in | 1.9 | 0.2 | 0.0 | 1.5 | 1.6 |
+| Definitions per 100 words, experts | 5.2 | 0.0 | 0.0 | 0.0 | 0.6 |
+
+For the readers who need definitions most, the second pass writes almost
+exactly as many as the teacher, where the first pass wrote none and Stage 1
+wrote a third to a tenth. The cost is the one you would predict: defining
+more terms means more chances to define one the reader already has, and the
+re-gloss rule slipped from 45 passes to 41. Overall rule compliance is back
+where Stage 1 left it, with the definition behaviour fixed.
+
+Experts and returning readers are still under-served: the teacher defines
+half a term per 100 words for them and the student none. The training log
+says why this pass moved the model less than the first did: held-out
+preference accuracy sat at 0.65 throughout, and the loss fell only from
+1.23 to 1.14 over 110 steps. The pair set pointed the right way; the
+learning rate was timid. A third pass at a higher rate, or Stage 3's reward
+model, is where that remaining gap gets worked on.
+
 
 **Caveats.** The samples are small, the materiality labels are the author's
 own, and no live run has yet passed the harness's ledger gate (precision 0.75
@@ -356,7 +383,7 @@ writer; the yardstick is the same harness.
 | Data | Distillation set: Claude writes briefings for synthetic reader states over 56 real events | **Done.** 500 generated, 452 pass automated faithfulness checks, split 415 / 45 |
 | 1 | Supervised fine-tuning of Qwen2.5-3B-Instruct with a LoRA adapter | **Done** 2026-10-13 on a Colab L4. Validation loss 0.87 to 0.69. On the 45 held-out packets, the fine-tuned model passes every hard rule on 40, against 30 for the untuned model and 45 for Claude. Charts below. |
 | Serving | Local model in the briefing seat via an OpenAI-compatible endpoint | **Done** and tested (`LOCAL_MODEL_*` variables) |
-| 2 | DPO on preference pairs ranked by the gate's rules, then a Claude judge | First pass run 2026-10-16: 44 of 45 on the rules, but the pair set leaned toward fewer definitions and the model stopped defining. Pair set rebuilt against the teacher; second pass next. |
+| 2 | DPO on preference pairs ranked by the gate's rules, then a Claude judge | **Two passes run 2026-10-16.** First pass: 44 of 45 on the rules but defined nothing, from a pair set that leaned toward fewer definitions. Second pass on teacher-anchored pairs: 40 of 45 on the rules, definitions back to the teacher's rate for beginners, still none for experts. |
 | 3 | RLAIF: a reward model trained on Claude's preferences, optimised with GRPO, the gate as guardrail | Planned; no code yet |
 
 See [training/README.md](training/README.md).
@@ -399,7 +426,7 @@ See [training/README.md](training/README.md).
 
 1. Put the Stage 1 student in the briefing seat for a live harness run and
    score the ledger it produces, not just its briefings.
-2. The second DPO pass on the corrected pair set, then Stage 3.
+2. A third DPO pass at a higher learning rate for the expert profiles, then Stage 3.
 3. A scored live run over all 21 personas on the current prompts, to
    establish a baseline for the gate.
 4. Authentication and hosting. The web app is single-machine, binds to

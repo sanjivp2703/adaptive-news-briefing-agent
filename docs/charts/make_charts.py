@@ -162,11 +162,12 @@ def stage1_rules_chart() -> str:
     d = DATA["stage1_hard_rules"]
     n = d["n"]
     palette = {"untuned base": "#b9b6ad", "fine-tuned student": SERIES[0],
-               "stage 2 (DPO, first pass)": SERIES[2], "teacher (Claude Sonnet)": SERIES[1]}
+               "stage 2 (DPO, first pass)": "#8fd3b4", "stage 2 (DPO, second pass)": SERIES[2],
+               "teacher (Claude Sonnet)": SERIES[1]}
     models = [(name, palette[name]) for name in d.get("_order", list(palette)) if name in d]
     rules = d["rules"]
-    width, height = 720, 440
-    left, right, top, bottom = 230, 640, 84, 380
+    width, height = 720, 530
+    left, right, top, bottom = 230, 640, 84, 440
     body = heading(
         "Hard rules passed on the 45 held-out packets, across training stages",
         "Same 45 packets, same checks the training data was filtered with, one bar per model.",
@@ -187,13 +188,15 @@ def stage1_rules_chart() -> str:
             body.append(f'<rect x="{left}" y="{y:.1f}" width="{w:.1f}" height="7" rx="2" fill="{color}"/>')
             if key == "all" or name != "teacher (Claude Sonnet)":
                 body.append(text(left + w + 6, y + 7, str(v), fill=INK2, size=10))
-    lx = 20
+    lx, ly = 20, bottom + 14
     for name, color in models:
-        body.append(f'<rect x="{lx}" y="{bottom + 14}" width="12" height="7" rx="2" fill="{color}"/>')
-        body.append(text(lx + 18, bottom + 21, name, fill=INK2, size=11))
+        if lx + 26 + 6.2 * len(name) > 700:
+            lx, ly = 20, ly + 16
+        body.append(f'<rect x="{lx}" y="{ly}" width="12" height="7" rx="2" fill="{color}"/>')
+        body.append(text(lx + 18, ly + 7, name, fill=INK2, size=11))
         lx += 26 + 6.2 * len(name)
-    parts = [f"{d[name]['all']} of {n} {name.split(' (')[0]}" for name, _ in models]
-    body.append(text(20, bottom + 42, "All rules at once: " + "; ".join(parts) + ".", fill=INK2, size=11))
+    parts = [f"{d[name]['all']} {name.replace('stage 2 (DPO, ', 'DPO ').rstrip(')').replace('teacher (Claude Sonnet)', 'teacher')}" for name, _ in models]
+    body.append(text(20, ly + 30, f"All rules at once, out of {n}: " + "; ".join(parts) + ".", fill=INK2, size=11))
     return svg(width, height, body, "Hard rules passed on the held-out packets, across training stages",
                "On 45 held-out packets: " + "; ".join(parts) + ".")
 
@@ -201,7 +204,8 @@ def stage1_rules_chart() -> str:
 def stage1_definitions_chart() -> str:
     d = DATA["stage1_definitions_by_profile"]
     labels = {"beginner": "Beginner", "partial": "Partway in", "expert_one_subdomain": "Expert in one area", "expert": "Expert", "returning_reader": "Returning reader"}
-    palette = {"untuned base": "#b9b6ad", "fine-tuned student": SERIES[0], "stage 2 (DPO, first pass)": SERIES[2], "teacher": SERIES[1]}
+    palette = {"untuned base": "#b9b6ad", "fine-tuned student": SERIES[0], "stage 2 (DPO, first pass)": "#8fd3b4",
+               "stage 2 (DPO, second pass)": SERIES[2], "teacher": SERIES[1]}
     present = {m for p in d.values() for m in p if m != "n"}
     models = [(m, c) for m, c in palette.items() if m in present]
     width, height = 720, 340
@@ -234,9 +238,9 @@ def stage1_definitions_chart() -> str:
     lx = 60
     for m, color in models:
         body.append(f'<rect x="{lx}" y="{top - 26}" width="12" height="7" rx="2" fill="{color}"/>')
-        body.append(text(lx + 18, top - 19, m, fill=INK2, size=11))
-        lx += 26 + 6.2 * len(m)
-    body.append(text(20, 312, "Untuned: too many. Stage 1: too few. First DPO pass: none at all, from a pair set that leaned toward fewer definitions.", fill=INK2, size=10.5))
+        body.append(text(lx + 18, top - 19, m, fill=INK2, size=10))
+        lx += 24 + 5.6 * len(m)
+    body.append(text(20, 312, "Untuned: too many. Stage 1: too few. First DPO pass: none. Second pass, on teacher-anchored pairs: back near the teacher for beginners, still low for experts.", fill=INK2, size=10))
     return svg(width, height, body, "Definitions per 100 words by reader profile, three models",
                "The untuned base defines far more than the teacher for every profile; the fine-tuned student defines less than the teacher for every profile.")
 

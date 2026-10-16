@@ -14,7 +14,7 @@ product works today.
 | Local-model seat in the product (`LOCAL_MODEL_*`) | done, tested |
 | Stage 1: LoRA fine-tune of Qwen2.5-3B-Instruct (`notebooks/01_sft_colab.ipynb`) | **done** 2026-10-13; validation loss 0.87 to 0.69 |
 | Stage 1 scoring on the 45 held-out packets (`notebooks/02_generate_eval_answers.ipynb` + `evaluate_student.py`) | **done**: all hard rules pass on 40 of 45, from 30 untuned; teacher 45 |
-| Stage 2: DPO on preference pairs (`notebooks/03_generate_dpo_candidates.ipynb` → `rank_pairs.py` → `notebooks/04_dpo_colab.ipynb`) | first pass run 2026-10-16; the pair set leaned toward fewer definitions and the model stopped defining; rebuilt by `build_pairs_v2.py`, second pass next |
+| Stage 2: DPO on preference pairs (`notebooks/03_generate_dpo_candidates.ipynb` → `rank_pairs.py` → `notebooks/04_dpo_colab.ipynb`) | two passes run 2026-10-16; first pass defined nothing (pair set leaned toward fewer definitions), second pass on `build_pairs_v2.py` pairs restored beginner definitions to the teacher's rate; experts still under-served |
 | Stage 3: RLAIF (reward model + GRPO, the regression gate as guardrail) | planned, no code |
 
 The Stage 1 results and charts are in the top-level README under
