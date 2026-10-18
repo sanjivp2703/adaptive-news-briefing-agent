@@ -4,9 +4,11 @@
     PYTHONPATH=src:. .venv/bin/python training/compare_vs_claude.py training/data/r1_answers.jsonl --label "round 1" --head-to-head
 
 On the 45 held-out packets, both the student's answer and Claude's recorded
-answer are scored by `reward.score_briefing`: hard rules, reader coverage,
-over-gloss, fit, composite. The report is the two side by side, overall and
-per reader profile. Claude is measured here, never used as the target.
+answer are scored by `reward.score_briefing` against the packet label: hard
+rules (including the definition cap), substance, gap handling, over-gloss,
+fit, composite, and the number of definitions each side made. The report is
+the two side by side, overall and per reader profile. Claude is measured
+here, never used as the target.
 
 `--head-to-head` adds the blind judge: for each packet, a Claude judge sees
 the student's briefing and Claude's in random order, twice with the order
@@ -26,17 +28,21 @@ from pathlib import Path
 from typing import Any
 
 from training.evaluate_student import other_events_for, packet_of, parse_answer, read_jsonl
-from training.reward import event_vocabulary, score_briefing
+from training.label_packets import DEFAULT_OUT as DEFAULT_LABELS
+from training.label_packets import load_labels
+from training.reward import score_briefing
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_VAL = HERE / "data" / "sft_val.jsonl"
-FIELDS = ("rules_passed", "coverage", "overgloss", "learning", "fit", "composite")
+FIELDS = ("rules_passed", "substance", "gap", "overgloss", "learning", "fit", "composite", "definitions")
+PROFILE_FIELDS = ("substance", "gap", "overgloss", "composite", "definitions")
 
 
 def compare(
-    rows: list[dict[str, Any]], answers: dict[str, str], *, draws: int = 16, head_to_head=None
+    rows: list[dict[str, Any]], answers: dict[str, str], *, labels: dict[str, dict[str, Any]] | None = None, head_to_head=None
 ) -> dict[str, Any]:
     others = other_events_for(rows)
+    labels = labels or {}
     results = []
     for row in rows:
         rid = row["meta"].get("id")
@@ -45,9 +51,9 @@ def compare(
         packet = packet_of(row)
         group = row["meta"].get("group_family") or "?"
         s_out, c_out = parse_answer(answers[rid]), parse_answer(row["messages"][2]["content"])
-        universe = event_vocabulary(packet, [s_out, c_out])
-        student = score_briefing(packet, s_out, others.get(group, []), draws=draws, universe_terms=universe)
-        claude = score_briefing(packet, c_out, others.get(group, []), draws=draws, universe_terms=universe)
+        label = labels.get(rid)
+        student = score_briefing(packet, s_out, others.get(group, []), label=label)
+        claude = score_briefing(packet, c_out, others.get(group, []), label=label)
         item = {"id": rid, "profile": row["meta"].get("profile") or "real",
                 "student": {f: getattr(student, f) for f in FIELDS}, "claude": {f: getattr(claude, f) for f in FIELDS}}
         if head_to_head is not None:
@@ -75,7 +81,7 @@ def summarise(results: list[dict[str, Any]]) -> dict[str, Any]:
     for r in results:
         by[r["profile"]].append(r)
     for profile, rows in by.items():
-        out["by_profile"][profile] = {"n": len(rows), **{who: {f: _mean(rows, who, f) for f in ("coverage", "overgloss", "fit", "composite")} for who in ("student", "claude")}}
+        out["by_profile"][profile] = {"n": len(rows), **{who: {f: _mean(rows, who, f) for f in PROFILE_FIELDS} for who in ("student", "claude")}}
     h2h = [r["head_to_head"] for r in results if r.get("head_to_head")]
     if h2h:
         decided = [h for h in h2h if h.get("winner") in ("student", "claude")]
@@ -93,9 +99,9 @@ def format_summary(summary: dict[str, Any], label: str) -> str:
         lines.append(f"  {f:<14} {a!s:>8} | {b!s:<8}")
     lines.append(f"  student has the higher composite on {o['student_higher_composite']} packets, ties {o['ties']}")
     lines.append("")
-    lines.append(f"  {'profile':<22}{'n':>3}  {'coverage':>15}  {'overgloss':>15}  {'fit':>15}  {'composite':>15}")
+    lines.append(f"  {'profile':<22}{'n':>3}  " + "  ".join(f"{f:>15}" for f in PROFILE_FIELDS))
     for profile, s in summary["by_profile"].items():
-        cells = [f"{s['student'][f]:5.2f} | {s['claude'][f]:5.2f}" for f in ("coverage", "overgloss", "fit", "composite")]
+        cells = [f"{s['student'][f]:5.2f} | {s['claude'][f]:5.2f}" for f in PROFILE_FIELDS]
         lines.append(f"  {profile:<22}{s['n']:>3}  " + "  ".join(f"{c:>15}" for c in cells))
     if "head_to_head" in summary:
         h = summary["head_to_head"]
@@ -128,7 +134,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--label", default="student")
     parser.add_argument("--val", type=Path, default=DEFAULT_VAL)
     parser.add_argument("--out", type=Path, default=None)
-    parser.add_argument("--draws", type=int, default=16)
+    parser.add_argument("--labels", type=Path, default=DEFAULT_LABELS, help="packet labels from label_packets.py")
     parser.add_argument("--head-to-head", action="store_true", help="blind Claude judge, student vs Claude (about 90 calls)")
     args = parser.parse_args(argv)
 
@@ -145,7 +151,10 @@ def main(argv: list[str] | None = None) -> int:
         except MissingCredentials as exc:
             print(exc, file=sys.stderr)
             return 2
-    report = compare(rows, answers, draws=args.draws, head_to_head=h2h)
+    labels = load_labels(args.labels)
+    if not labels:
+        print(f"no packet labels at {args.labels}; run training/label_packets.py first (gap falls back to the ledger)", file=sys.stderr)
+    report = compare(rows, answers, labels=labels, head_to_head=h2h)
     report["label"] = args.label
     report["judge_spend_usd"] = round(spend["usd"], 2)
     out = args.out or HERE / "data" / f"compare_{args.label.replace(' ', '_')}.json"

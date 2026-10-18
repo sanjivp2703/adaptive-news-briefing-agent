@@ -11,10 +11,18 @@ PACKET = {
     "proficiency": "beginner",
     "concept_ledger": {"unknown": ["offside", "var"], "familiar": ["derby"], "explained": [], "confirmed": [], "provisional": []},
     "subdomain_familiarity": {},
-    "events": [{"headline": "City win the derby 2-1", "detail": "Haaland scored twice; the winner came in the 88th minute."}],
+    "events": [{"headline": "City win the derby 2-1", "detail": "Haaland scored twice; the winner came in the 88th minute after a VAR check for offside."}],
+}
+LABEL = {
+    "terms": [{"term": "offside", "central": True, "subdomain": "rules"}, {"term": "var", "central": True, "subdomain": "rules"}],
+    "facts": [{"fact": "City beat United 2-1.", "anchors": ["City", "2-1"], "terms": []},
+              {"fact": "The winner came in the 88th minute after a VAR check for offside.", "anchors": ["88th", "winner"], "terms": ["var", "offside"]}],
 }
 TEXT = ("City beat United 2-1 in the derby. Haaland scored twice, the second in the 88th minute. "
-        "Offside, meaning an attacker was beyond the last defender when the ball was played, was checked by VAR, the video review system.")
+        "Offside, meaning an attacker was beyond the last defender when the ball was played, was checked by VAR, the video review system. "
+        "United's manager said the call was wrong and the away fans were furious at full time, but the result stands. "
+             "The referee took nearly four minutes over the review while both benches argued, and the home crowd whistled throughout. City now sit second in the table, two points behind the leaders with ten games left to play.")
+SILENT_TEXT = "City beat United 2-1 in the derby. Haaland scored twice, the winner in the 88th minute after a VAR check for offside."
 
 
 def _b(explained, used=("offside", "var", "derby"), text=TEXT):
@@ -22,9 +30,13 @@ def _b(explained, used=("offside", "var", "derby"), text=TEXT):
 
 
 FULL = _b(["offside", "var"])
-HALF = _b(["offside"])
-NONE = _b([])
-REGLOSS = _b(["offside", "var", "derby"])          # defines a known term
+HALF = _b(["offside"], text="City beat United 2-1 in the derby. Haaland scored twice, the second in the 88th minute. "
+          "Offside, meaning an attacker was beyond the last defender when the ball was played, was checked by VAR. "
+          "United's manager said the call was wrong and the away fans were furious at full time, but the result stands. "
+             "The referee took nearly four minutes over the review while both benches argued, and the home crowd whistled throughout. City now sit second in the table, two points behind the leaders with ten games left to play.")
+SILENT = _b([], text=SILENT_TEXT)                                   # strands both gap terms
+MUTE = _b([], used=(), text="City beat United 2-1. Haaland scored twice.")  # names nothing, drops the gap
+REGLOSS = _b(["offside", "var", "derby"])                           # defines a known term
 BAD_NUMBER = _b(["offside", "var"], text=TEXT + " The fee was 300 million pounds.")
 
 
@@ -36,20 +48,27 @@ def _row(rid="p1"):
 
 
 def _scores(texts):
-    return v3.score_candidates(PACKET, texts, [], draws=12)
+    return v3.score_candidates(PACKET, texts, [], label=LABEL)
 
 
 def test_best_against_worst_when_the_gap_is_real():
-    texts = [NONE, FULL, HALF]
+    texts = [SILENT, FULL, HALF]
     pair = v3.choose_pair(texts, _scores(texts), margin=0.1, judge=None, packet=PACKET)
-    assert pair["chosen"] == FULL and pair["rejected"] == NONE and pair["decided_by"] == "reward"
+    assert pair["chosen"] == FULL and pair["rejected"] == SILENT and pair["decided_by"] == "reward"
 
 
 def test_a_re_glosser_is_not_rejected_in_favour_of_a_briefing_that_teaches_less():
-    # Worst by reward is the re-glosser (rules fail), but it covers more than
-    # the silent briefing. The silent briefing must not be the winner.
-    texts = [NONE, REGLOSS]
+    # Worst by reward is the re-glosser (rules fail), but it handles the gap
+    # and the silent briefing does not. The silent briefing must not win.
+    texts = [SILENT, REGLOSS]
     assert v3.choose_pair(texts, _scores(texts), margin=0.1, judge=None, packet=PACKET) is None
+
+
+# Prevents: the round-1 pair set, where "names nothing" beat "strands everything"
+# and the model learned to define nothing.
+def test_two_briefings_that_both_leave_the_reader_stranded_make_no_pair():
+    texts = [SILENT, MUTE]
+    assert v3.choose_pair(texts, _scores(texts), margin=0.0, judge=None, packet=PACKET) is None
 
 
 def test_an_invented_number_is_rejected_even_when_it_defined_more():
@@ -63,10 +82,12 @@ def test_the_chosen_side_always_passes_the_rules():
     assert v3.choose_pair(texts, _scores(texts), margin=0.1, judge=None, packet=PACKET) is None
 
 
-def test_build_reports_pairs_and_skips():
+def test_build_reports_pairs_skips_and_the_definition_lean():
     rows = [_row("p1"), _row("p2")]
-    cands = [{"id": "p1", "round": 1, "candidates": [NONE, FULL, HALF, BAD_NUMBER]},
-             {"id": "p2", "round": 1, "candidates": [NONE, REGLOSS]}]
-    pairs, summary = v3.build(rows, cands, margin=0.1, draws=12)
+    cands = [{"id": "p1", "round": 1, "candidates": [SILENT, FULL, HALF]},
+             {"id": "p2", "round": 1, "candidates": [SILENT, REGLOSS]}]
+    pairs, summary = v3.build(rows, cands, margin=0.1, labels={"p1": LABEL, "p2": LABEL})
     assert summary["pairs"] == 1 and summary["skipped"] == 1 and pairs[0]["id"] == "p1"
-    assert score_briefing(PACKET, json.loads(pairs[0]["chosen"]), [], draws=4).rules_passed
+    assert summary["lean"] == {"chosen defines more": 1}
+    assert summary["mean_gap_chosen"] > summary["mean_gap_rejected"]
+    assert score_briefing(PACKET, json.loads(pairs[0]["chosen"]), [], label=LABEL).rules_passed

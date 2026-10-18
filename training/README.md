@@ -371,16 +371,46 @@ end goal is a student that scores better than Claude's recorded briefings
 on measures that do not use Claude's text, and that the live persona
 harness prefers in the briefing seat.
 
-**The reward** (`reward.py`), all by code:
+**The reward** (`reward.py`), all by code. It decides what a briefing
+*needs* from the story and the reader before the model writes anything,
+never from the briefing's own term list. Each packet's source story is
+labelled once by Claude (`label_packets.py`: its domain terms, which are
+central, and three to five key facts with anchors); that is judging the
+source, not writing a target.
 
-1. The hard rules. Break one and the briefing scores zero.
-2. Reader learning, from the harness's memory model seeded in the packet's
-   state, with un-ledgered terms held with probability equal to the
-   reader's familiarity with their subdomain. Gain is coverage of the
-   lacking terms; defining a term the reader probably held is a cost. This
-   is what catches an expert being talked down to.
-3. Fit: readability band and length targets per proficiency, from
-   plain-language guidance, not from the teacher's averages.
+1. The hard rules, plus a **definition cap**: at most one definition per
+   250 characters and never more than two. A definition is a declared term
+   the text contains or a prose gloss ("MCL (medial collateral ligament)",
+   "offside, meaning ..."), declared or not. Break a rule and the briefing
+   scores zero. The cap fails 4% of Claude's own briefings, the gloss-stacked
+   ones.
+2. **Substance**: the share of the story's key facts the briefing carries.
+3. **Gap handling**. The gap is the story's central terms this reader lacks
+   (ledger-unknown, or un-ledgered in a subdomain the reader is beginner or
+   developing in). Each gap term is *taught* (present and glossed), *said
+   plainly* (absent, but its fact is present), or *stranded or dropped*
+   (present unglossed, or gone with its fact). A reader who lacks nothing is
+   judged on substance alone, so zero definitions is right when the story
+   needs none and wrong when it does not.
+4. **Over-gloss**: definitions spent on terms the reader holds, a cost.
+5. **Fit**: 50 to 140 words. Reading grade was dropped as a dial: it tracks
+   the subject more than the reader.
+
+Composite = 0.45 substance + 0.35 (gap minus over-gloss) + 0.2 fit.
+Defining nothing fails as soon as the story has a gap; stacking glosses
+breaks the cap or crowds out the facts. The only way up is to tell the
+whole story and make each gap term land, by teaching it or in plain words.
+
+**Round 1, first attempt (2026-10-17), and why the reward changed.** The
+first version of this reward measured coverage of the reader's lacking
+terms. For expert, returning and partway readers the reader lacks nothing,
+so coverage was 1.0 whatever the briefing did, and the pair builder's
+"never teach define-less" guard passed trivially. 126 of 293 pairs preferred
+the briefing with fewer definitions. The trained model scored level with
+Claude on that reward (0.498 vs 0.497) while defining zero terms for every
+reader, including beginners, and had started glossing in prose without
+declaring it. The reward above is the replacement; `build_pairs_v3.py` now
+also skips any packet whose best candidate strands or drops the whole gap.
 
 **Each round** (`notebooks/05_generate_round_candidates.ipynb` →
 `build_pairs_v3.py` → `notebooks/04_dpo_colab.ipynb` → score): the current

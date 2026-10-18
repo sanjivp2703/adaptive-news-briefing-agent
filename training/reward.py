@@ -1,73 +1,87 @@
-"""The reward for a briefing, with no reference to the teacher's text.
+"""The reward for a briefing, decided from the story and the reader, not from the briefing's own claims.
 
 Stage 3's rule: Claude writes no more targets. A briefing is scored on what
 can be measured about it for the reader the packet describes, and Claude may
-only ever judge between two student briefings (see `rank_pairs.claude_judge`).
-The components, all computed by code:
+only ever judge between two student briefings (`rank_pairs.claude_judge`) or
+label the *source* story once (`label_packets.py`). The components, all
+computed by code:
 
-1. **Hard rules** (`generate_sft.run_checks`). A briefing that breaks one
-   scores zero overall. Everything else is conditional on passing.
-2. **Reader learning**, from the harness's memory model. The reader is seeded
-   in the packet's state: ledger-known terms held, ledger-unknown terms not
-   held, and every other term the briefing uses held with probability equal
-   to the reader's familiarity with that term's subdomain (beginner 0.1,
-   developing 0.4, conversant 0.7, fluent 0.9). Each defined term is a glossed
-   encounter at `read` quality. Gain is the expected number of terms the
-   reader can define a day later that they could not before, averaged over
-   draws, divided by the number of terms the reader lacked, so it is a
-   coverage in 0..1. The terms are a universe shared by every briefing being
-   compared for the packet (see `event_vocabulary`), so a briefing cannot
-   score well by naming fewer terms, and a defined term only counts if the
-   briefing text contains it. Defining a term the draw seeded as held costs: that is
-   the expert being talked down to, which no rule catches because the term
-   was not in the ledger.
-3. **Fit**, from readability and length targets by band. Flesch-Kincaid
-   grade: beginner 7-10, developing 8-12, conversant 9-13, fluent 9-14,
-   losing 0.15 per grade outside the range. Length: 50-140 words, losing
-   0.01 per word outside. The targets come from plain-language guidance and
-   the reading-speed research the harness already cites, not from the
-   teacher's averages.
+1. **Hard rules.** The generator's rules (`generate_sft.run_checks`: no
+   question, only the packet's event, every number supported, no re-gloss of
+   a known term, explained terms are used terms) plus the **definition cap**:
+   at most one definition per `DEFINITION_CHARS` characters of briefing and
+   never more than `MAX_DEFINITIONS`. A briefing that breaks a rule scores
+   zero. A definition is a term the briefing declares in `explained_terms`
+   and actually contains, or a term the prose glosses ("MCL (medial
+   collateral ligament)", "offside, meaning ...", "known as a hat-trick"),
+   whether declared or not.
 
-Composite = 0 if any rule fails, else 0.6 * learning + 0.4 * fit, where
-learning = coverage - 0.5 * overgloss_fraction, clipped to 0..1.
+2. **Substance**: the share of the story's key facts (from the packet label)
+   whose anchors appear in the briefing. Without a label it is 1.0 and the
+   score falls back to the other components.
+
+3. **Gap handling.** The gap is the set of the story's central terms (label)
+   that this reader lacks: ledger-unknown, or not in the ledger and in a
+   subdomain the reader is beginner/developing in. Each gap term has one of
+   three outcomes: *taught* (present and glossed, 1.0), *said plainly*
+   (absent, but a fact it belongs to is present: 1.0, or 0.8 when the term
+   recurs in the group's other stories and so was worth teaching), *stranded
+   or dropped* (present unglossed, or absent with its fact: 0). Any other
+   term the briefing uses that the reader lacks, unglossed, is stranded too.
+   The gap score is the mean over those outcomes; 1.0 when there is nothing
+   to handle. A reader who lacks nothing is judged on substance alone.
+
+4. **Over-gloss**: the share of definitions spent on terms the reader holds
+   (ledger-known is caught by the hard rule; this catches un-ledgered terms
+   in a subdomain the reader is conversant/fluent in). learning = gap -
+   0.5 * overgloss, clipped to 0..1.
+
+5. **Fit**: 50-140 words, losing 0.01 per word outside.
+
+Composite = 0 if any rule fails, else 0.45 * substance + 0.35 * learning +
+0.2 * fit. Defining nothing fails as soon as the story has a gap. Stacking
+glosses breaks the cap or crowds out the facts. The only way up is to tell
+the whole story and make each gap term land, by teaching it or by plain words.
 """
 
 from __future__ import annotations
 
-import random
-import statistics
+import re
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from conversational_agent import config
-from harness.learning import LearningSpec, MemoryModel
 from harness.plainness import plainness
-from training.generate_sft import normalize_term, run_checks
+from training.generate_sft import normalize_term, numbers_in, run_checks
 
 BAND_WEIGHT = {"beginner": 0.1, "developing": 0.4, "conversant": 0.7, "fluent": 0.9}
-GRADE_RANGE = {"beginner": (7.0, 10.0), "developing": (8.0, 12.0), "conversant": (9.0, 13.0), "fluent": (9.0, 14.0)}
+LACKS_BELOW = 0.5           # hold probability under which the reader is taken to lack a term
+DEFINITION_CHARS = 250      # one definition allowed per this many characters of briefing
+MAX_DEFINITIONS = 2
 WORDS_RANGE = (50, 140)
-DRAWS = 24
-HORIZON = timedelta(days=1)
-LEARNING_WEIGHT = 0.6
-FIT_WEIGHT = 0.4
+SUBSTANCE_WEIGHT = 0.45
+LEARNING_WEIGHT = 0.35
+FIT_WEIGHT = 0.2
 OVERGLOSS_PENALTY = 0.5
+PLAIN_WHEN_RECURRING = 0.8
+UNVERIFIABLE_PLAIN = 0.5    # term absent, no fact to check it against
 
 
 @dataclass
 class Score:
     rules_passed: bool
     rule_failures: list[str]
-    coverage: float          # 0..1: lacking terms the reader can now define
-    overgloss: float         # 0..1: share of defined terms the reader probably held
-    learning: float          # coverage - penalty * overgloss, clipped
+    substance: float         # 0..1: key facts carried
+    gap: float               # 0..1: gap terms taught or said plainly
+    overgloss: float         # 0..1: share of definitions the reader did not need
+    learning: float          # gap - penalty * overgloss, clipped
     fit: float               # 0..1
     composite: float         # 0 if rules failed
+    definitions: int = 0
     details: dict[str, Any] = field(default_factory=dict)
 
 
-# --- Reading the packet ---------------------------------------------------------
+# --- Reading the packet and the label ---------------------------------------------
 
 
 def _terms(output: dict[str, Any] | None, key: str) -> list[str]:
@@ -110,103 +124,156 @@ def hold_probability(term: str, labels: dict[str, str], weights: dict[str, float
     return BAND_WEIGHT.get(band, 0.4)
 
 
-# --- Components -------------------------------------------------------------------
+def reader_lacks(term: str, packet: dict[str, Any], labels: dict[str, str]) -> bool:
+    known, unknown, band, weights = reader_state(packet)
+    if term in known:
+        return False
+    if term in unknown:
+        return True
+    return hold_probability(term, labels, weights, band) < LACKS_BELOW
+
+
+_TERM_END = r"(?:s|es|'s)?(?![a-z0-9])"   # plurals and possessives count as the term
 
 
 def term_in_text(term: str, text: str) -> bool:
-    """A defined term counts only if the briefing actually contains it."""
     t = normalize_term(term)
+    return bool(t) and re.search(rf"(?<![a-z0-9]){re.escape(t)}{_TERM_END}", normalize_term(text)) is not None
+
+
+# --- Definitions ----------------------------------------------------------------------
+
+_GLOSS_AFTER = r"\s*(?:\(|,\s*(?:meaning|which|that is|i\.e\.|or |a |an |the )|\s+(?:means|refers to|is (?:a |an |the |when )))"
+_GLOSS_BEFORE = r"(?:called|known as|so called|termed|dubbed)\s+(?:a |an |the )?"
+
+
+def prose_glosses(text: str, terms: list[str]) -> list[str]:
+    """Terms the prose glosses, declared or not: "T (…)", "(T)" after an
+    expansion, "T, meaning …", "T, which …", "T means …", "called T"."""
     body = normalize_term(text)
-    return bool(t) and t in body
+    out = []
+    for term in terms:
+        t = re.escape(normalize_term(term))
+        if not t:
+            continue
+        if (re.search(rf"(?<![a-z0-9]){t}(?:s|es|'s)?{_GLOSS_AFTER}", body)
+                or re.search(rf"\(\s*{t}(?:s|es)?\s*\)", body)
+                or re.search(rf"{_GLOSS_BEFORE}{t}{_TERM_END}", body)):
+            out.append(normalize_term(term))
+    return out
 
 
-def learning_components(
-    packet: dict[str, Any],
-    output: dict[str, Any] | None,
-    *,
-    draws: int = DRAWS,
-    seed: str = "reward",
-    universe_terms: list[str] | None = None,
+def definitions(output: dict[str, Any] | None, candidate_terms: list[str] = ()) -> list[str]:
+    """Every term the briefing defines: declared and present, or glossed in prose."""
+    text = str((output or {}).get("briefing") or "")
+    declared = [t for t in _terms(output, "explained_terms") if term_in_text(t, text)]
+    pool = list(dict.fromkeys(_terms(output, "terms_used") + [normalize_term(t) for t in candidate_terms]))
+    return list(dict.fromkeys(declared + prose_glosses(text, pool)))
+
+
+def definition_cap(text: str) -> int:
+    return min(MAX_DEFINITIONS, max(1, len(text) // DEFINITION_CHARS))
+
+
+# --- Components -------------------------------------------------------------------
+
+
+def _anchor_present(anchor: str, body: str) -> bool:
+    nums = numbers_in(anchor)
+    if nums:
+        body_keys = {n["key"] for n in numbers_in(body)}
+        return all(n["key"] in body_keys for n in nums)
+    return term_in_text(anchor, body)
+
+
+def substance_score(output: dict[str, Any] | None, label: dict[str, Any] | None) -> tuple[float, dict[str, Any]]:
+    facts = (label or {}).get("facts") or []
+    if not facts:
+        return 1.0, {"facts": 0, "facts_present": 0}
+    text = str((output or {}).get("briefing") or "")
+    present = 0
+    for fact in facts:
+        anchors = fact.get("anchors") or []
+        hits = sum(1 for a in anchors if _anchor_present(a, text))
+        if anchors and hits * 2 >= len(anchors):
+            present += 1
+    return round(present / len(facts), 3), {"facts": len(facts), "facts_present": present}
+
+
+def gap_terms(packet: dict[str, Any], label: dict[str, Any] | None) -> list[str]:
+    """Central story terms this reader lacks. Without a label: ledger-unknown
+    terms that the source mentions."""
+    subdomains = {t["term"]: t.get("subdomain") or "" for t in (label or {}).get("terms") or []}
+    if label and label.get("terms"):
+        central = [t["term"] for t in label["terms"] if t.get("central")]
+    else:
+        event = (packet.get("events") or [{}])[0]
+        source = f"{event.get('headline') or ''} {event.get('detail') or ''}"
+        _, unknown, _, _ = reader_state(packet)
+        central = [t for t in sorted(unknown) if term_in_text(t, source)]
+    return [t for t in central if reader_lacks(t, packet, subdomains)]
+
+
+def gap_components(
+    packet: dict[str, Any], output: dict[str, Any] | None, label: dict[str, Any] | None, other_events: list[str]
 ) -> tuple[float, float, dict[str, Any]]:
-    """(coverage, overgloss fraction, details) for one briefing.
+    """(gap score, overgloss fraction, details)."""
+    text = str((output or {}).get("briefing") or "")
+    label_terms = [t["term"] for t in (label or {}).get("terms") or []]
+    subdomains = {**_labels(output), **{t["term"]: t.get("subdomain") or "" for t in (label or {}).get("terms") or []}}
+    defined = set(definitions(output, label_terms))
+    gap = gap_terms(packet, label)
+    facts_by_term: dict[str, list[dict[str, Any]]] = {}
+    for fact in (label or {}).get("facts") or []:
+        for t in fact.get("terms") or []:
+            facts_by_term.setdefault(normalize_term(t), []).append(fact)
+    outcomes: dict[str, str] = {}
+    values: list[float] = []
+    for term in gap:
+        if term_in_text(term, text):
+            taught = term in defined
+            outcomes[term] = "taught" if taught else "stranded"
+            values.append(1.0 if taught else 0.0)
+            continue
+        facts = facts_by_term.get(term, [])
+        if not facts:
+            outcomes[term] = "absent"
+            values.append(UNVERIFIABLE_PLAIN)
+            continue
+        conveyed = any(_fact_present(f, text) for f in facts)
+        if not conveyed:
+            outcomes[term] = "dropped"
+            values.append(0.0)
+            continue
+        recurring = any(term_in_text(term, o) for o in other_events)
+        outcomes[term] = "said plainly"
+        values.append(PLAIN_WHEN_RECURRING if recurring else 1.0)
+    # Terms the briefing brings in itself that the reader lacks, unglossed.
+    for term in _terms(output, "terms_used"):
+        if term in outcomes or term in defined or not term_in_text(term, text):
+            continue
+        if reader_lacks(term, packet, subdomains):
+            outcomes[term] = "stranded"
+            values.append(0.0)
+    score = round(sum(values) / len(values), 3) if values else 1.0
+    needless = [t for t in defined if not reader_lacks(t, packet, subdomains)]
+    overgloss = round(len(needless) / len(defined), 3) if defined else 0.0
+    return score, overgloss, {"gap": gap, "outcomes": outcomes, "defined": sorted(defined), "needless": needless}
 
-    `universe_terms` is the set of domain terms the reader might need for this
-    event, shared by every briefing being compared for the same packet. Without
-    it a briefing could shrink its own `terms_used` list and claim full
-    coverage of nothing; with it, coverage is measured over the same terms for
-    every candidate. Callers build it as the union of terms across candidates
-    plus the ledger's unknown terms that the event text mentions.
-    """
-    known, unknown, band, weights = reader_state(packet)
-    briefing_text = str((output or {}).get("briefing") or "")
-    explained = [t for t in _terms(output, "explained_terms") if term_in_text(t, briefing_text)]
-    own_used = list(dict.fromkeys(_terms(output, "terms_used") + explained))
-    used = list(dict.fromkeys([normalize_term(t) for t in (universe_terms or [])] + own_used))
-    labels = _labels(output)
-    if not used:
-        return 0.0, 0.0, {"used": 0, "lacking": 0}
-    at = datetime(2026, 9, 1, tzinfo=UTC)
-    spec = LearningSpec(prior_knowledge=BAND_WEIGHT.get(band, 0.4), memory_rate=1.0)
-    universe = sorted(known | unknown | set(used))
-    event_key = str((packet.get("events") or [{}])[0].get("headline") or "event")
-    coverages: list[float] = []
-    overglosses: list[float] = []
-    had_lacking: list[bool] = []
-    for draw in range(draws):
-        rng = random.Random(f"{seed}:{draw}")
-        held = set(known)
-        for term in used:
-            if term in known or term in unknown:
-                continue
-            if rng.random() < hold_probability(term, labels, weights, band):
-                held.add(term)
-        lacking = [t for t in used if t not in held]
-        model = MemoryModel.seeded(
-            learning=spec, seed=f"{seed}:{draw}", persona_id="reader", universe=universe,
-            knows=held, does_not_know=[t for t in used if t not in held], at=at,
-        )
-        before = sum(model.ladder(t, at + HORIZON)[1] for t in lacking)
-        for term in explained:
-            model.glossed(term, "read", at, context_id=event_key)
-        after = sum(model.ladder(t, at + HORIZON)[1] for t in lacking)
-        coverages.append((after - before) / len(lacking) if lacking else 1.0)
-        had_lacking.append(bool(lacking))
-        overglosses.append(sum(1 for t in explained if t in held) / len(explained) if explained else 0.0)
-    coverage = max(0.0, min(1.0, statistics.mean(coverages)))
-    overgloss = statistics.mean(overglosses)
-    return coverage, overgloss, {"used": len(used), "explained": len(explained),
-                                 "candidates_lacking": len([t for t in used if t not in known]),
-                                 # Share of draws in which the reader lacked something: when 0,
-                                 # coverage is 1.0 by definition (nothing to teach, nothing missed).
-                                 "share_with_lacking": round(sum(had_lacking) / len(had_lacking), 2)}
+
+def _fact_present(fact: dict[str, Any], text: str) -> bool:
+    anchors = fact.get("anchors") or []
+    hits = sum(1 for a in anchors if _anchor_present(a, text))
+    return bool(anchors) and hits * 2 >= len(anchors)
 
 
 def fit_score(packet: dict[str, Any], output: dict[str, Any] | None) -> tuple[float, dict[str, Any]]:
-    band = str(packet.get("proficiency") or "beginner")
     briefing = str((output or {}).get("briefing") or "")
     p = plainness(briefing)
-    low, high = GRADE_RANGE.get(band, GRADE_RANGE["developing"])
-    grade = float(p["fk_grade"])
-    grade_fit = 1.0 if low <= grade <= high else max(0.0, 1.0 - 0.15 * (low - grade if grade < low else grade - high))
     words = int(p["words"])
     lo_w, hi_w = WORDS_RANGE
     words_fit = 1.0 if lo_w <= words <= hi_w else max(0.0, 1.0 - 0.01 * (lo_w - words if words < lo_w else words - hi_w))
-    return round(grade_fit * words_fit, 3), {"grade": grade, "words": words, "band": band}
-
-
-def event_vocabulary(packet: dict[str, Any], outputs: list[dict[str, Any] | None]) -> list[str]:
-    """The shared term universe for one packet: every term any compared
-    briefing used or defined, plus the ledger's unknown terms that appear in
-    the event text."""
-    event = (packet.get("events") or [{}])[0]
-    event_text = normalize_term(f"{event.get('headline') or ''} {event.get('detail') or ''}")
-    _, unknown, _, _ = reader_state(packet)
-    terms: list[str] = [t for t in sorted(unknown) if t and t in event_text]
-    for out in outputs:
-        for t in _terms(out, "terms_used") + _terms(out, "explained_terms"):
-            if t not in terms:
-                terms.append(t)
-    return terms
+    return round(words_fit, 3), {"words": words, "grade": float(p["fk_grade"]), "band": str(packet.get("proficiency") or "beginner")}
 
 
 def score_briefing(
@@ -214,22 +281,29 @@ def score_briefing(
     output: dict[str, Any] | None,
     other_events: list[str],
     *,
-    draws: int = DRAWS,
-    universe_terms: list[str] | None = None,
+    label: dict[str, Any] | None = None,
 ) -> Score:
     event = (packet.get("events") or [{}])[0]
     own = f"{event.get('headline') or ''} {event.get('detail') or ''}"
-    checks = run_checks(packet, output, [o for o in other_events if o != own])
+    others = [o for o in other_events if o != own]
+    checks = run_checks(packet, output, others)
     failures = [k for k, v in checks.items() if k not in ("details", "passed") and not v]
     if output is None:
         failures = ["not valid JSON", *failures]
-    passed = output is not None and bool(checks["passed"])
-    coverage, overgloss, ldetails = learning_components(packet, output, draws=draws, universe_terms=universe_terms)
-    learning = max(0.0, min(1.0, coverage - OVERGLOSS_PENALTY * overgloss))
+    text = str((output or {}).get("briefing") or "")
+    defined = definitions(output, [t["term"] for t in (label or {}).get("terms") or []])
+    cap = definition_cap(text)
+    if output is not None and len(defined) > cap:
+        failures.append("definition_cap")
+    passed = output is not None and bool(checks["passed"]) and len(defined) <= cap
+    substance, sdetails = substance_score(output, label)
+    gap, overgloss, gdetails = gap_components(packet, output, label, others)
+    learning = max(0.0, min(1.0, gap - OVERGLOSS_PENALTY * overgloss))
     fit, fdetails = fit_score(packet, output)
-    composite = 0.0 if not passed else round(LEARNING_WEIGHT * learning + FIT_WEIGHT * fit, 4)
+    composite = 0.0 if not passed else round(SUBSTANCE_WEIGHT * substance + LEARNING_WEIGHT * learning + FIT_WEIGHT * fit, 4)
     return Score(
-        rules_passed=passed, rule_failures=failures, coverage=round(coverage, 3), overgloss=round(overgloss, 3),
-        learning=round(learning, 3), fit=fit, composite=composite,
-        details={**ldetails, **fdetails, "checks": {k: v for k, v in checks.items() if k != "details"}},
+        rules_passed=passed, rule_failures=failures, substance=substance, gap=gap, overgloss=overgloss,
+        learning=round(learning, 3), fit=fit, composite=composite, definitions=len(defined),
+        details={**sdetails, **gdetails, **fdetails, "definition_cap": cap,
+                 "checks": {k: v for k, v in checks.items() if k != "details"}},
     )
