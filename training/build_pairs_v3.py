@@ -8,9 +8,12 @@ four student briefings per training packet. Every candidate is scored by
 story's central terms and key facts). For each packet:
 
 - the best candidate must pass the hard rules, or the packet is skipped;
-- when the reader has a gap, the best candidate must handle at least part of
-  it (gap score above zero), or the packet is skipped: a pair never teaches
-  stranding or dropping the terms the reader lacks;
+- the reader must have a gap, or the packet is skipped (from round 2: the
+  round-1b set was half expert packets, all leaning "define less", and the
+  model learned the lean);
+- the best candidate must handle at least part of the gap and must strand no
+  more gap terms than the rejected side: a pair never teaches leaving the
+  jargon in without a gloss, round 1b's failure;
 - the worst candidate is the lowest-scoring one (a rule breaker if there is
   one, else the lowest composite);
 - the chosen side must handle the gap at least as well as the rejected
@@ -58,6 +61,10 @@ def score_candidates(
     return [score_briefing(packet, parse_answer(t), others, label=label) for t in texts]
 
 
+def _stranded(score: Score) -> int:
+    return sum(1 for o in score.details.get("outcomes", {}).values() if o == "stranded")
+
+
 def choose_pair(
     texts: list[str], scores: list[Score], *, margin: float, judge: Judge | None, packet: dict[str, Any]
 ) -> dict[str, Any] | None:
@@ -65,8 +72,21 @@ def choose_pair(
     best, worst = order[0], order[-1]
     if not scores[best].rules_passed:
         return None
-    if scores[best].details.get("gap") and scores[best].gap <= 0.0:
-        return None  # the reader lacks terms and the best candidate strands or drops them all
+    if not scores[best].details.get("gap"):
+        return None  # round 2 on: a reader who lacks nothing teaches nothing about definitions
+    if scores[best].gap <= 0.0:
+        return None  # the best candidate strands or drops the whole gap
+    # The chosen side must strand no more gap terms than the rejected side,
+    # whatever else the rejected side did: round 1b showed the model keeping
+    # the jargon in without a gloss, and these pairs are what push against it.
+    for cand in reversed(order[1:]):
+        if _stranded(scores[best]) <= _stranded(scores[cand]) or any(
+            f not in LENIENT_RULES for f in scores[cand].rule_failures
+        ):
+            worst = cand
+            break
+    else:
+        return None
     gap = scores[best].composite - scores[worst].composite
     # A pair must never teach "define less". The chosen side has to handle the
     # reader's gap at least as well as the rejected side, unless the rejected

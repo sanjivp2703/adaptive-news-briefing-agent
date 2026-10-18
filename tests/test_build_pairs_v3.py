@@ -82,6 +82,20 @@ def test_the_chosen_side_always_passes_the_rules():
     assert v3.choose_pair(texts, _scores(texts), margin=0.1, judge=None, packet=PACKET) is None
 
 
+def test_a_reader_with_no_gap_makes_no_pair():
+    expert = dict(PACKET, proficiency="fluent", concept_ledger={"unknown": [], "familiar": ["offside", "var", "derby"], "explained": [], "confirmed": [], "provisional": []})
+    texts = [SILENT, FULL]
+    scores = v3.score_candidates(expert, texts, [], label=LABEL)
+    assert v3.choose_pair(texts, scores, margin=0.0, judge=None, packet=expert) is None
+
+
+# Prevents: round 1b, where the chosen side could strand as many gap terms as the rejected side.
+def test_the_chosen_side_never_strands_more_than_the_rejected_side():
+    texts = [HALF, SILENT]
+    pair = v3.choose_pair(texts, _scores(texts), margin=0.0, judge=None, packet=PACKET)
+    assert pair["chosen"] == HALF and pair["rejected"] == SILENT
+
+
 def test_build_reports_pairs_skips_and_the_definition_lean():
     rows = [_row("p1"), _row("p2")]
     cands = [{"id": "p1", "round": 1, "candidates": [SILENT, FULL, HALF]},
