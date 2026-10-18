@@ -412,6 +412,28 @@ reader, including beginners, and had started glossing in prose without
 declaring it. The reward above is the replacement; `build_pairs_v3.py` now
 also skips any packet whose best candidate strands or drops the whole gap.
 
+**Baselines on the rebuilt reward** (45 held-out packets, `compare_vs_claude.py`;
+"definitions" is the mean count per briefing, prose glosses included):
+
+| | hard rules | substance | gap handling | over-gloss | definitions | composite |
+|---|---|---|---|---|---|---|
+| Stage 1 student | 37/45 | 0.83 | 0.52 | 0.13 | 0.56 | 0.61 |
+| Stage 2, pass 1 | 43/45 | 0.88 | 0.50 | 0.07 | 0.29 | 0.73 |
+| Stage 2, pass 2 | 37/45 | 0.84 | 0.56 | 0.15 | 0.62 | 0.63 |
+| Round 1, first attempt (gamed) | 45/45 | 0.85 | 0.43 | 0.07 | 0.16 | 0.73 |
+| Claude, measured | 42/45 | 0.85 | 0.76 | 0.11 | 0.67 | 0.78 |
+
+The gamed model's gap handling (0.43) is now the lowest of the five, which
+is what the reward is for. The rebuilt round-1 pair set (319 pairs from the
+same candidates): chosen side handles the gap at 0.73 against 0.50 for the
+rejected side, with substance 0.86 against 0.73. For beginners the chosen
+side defines as often as the rejected side (0.81 each) and handles the gap
+mostly by saying the term's fact in plain words (103 outcomes) or teaching
+it (33); for experts, who lack nothing, it defines less (0.10 against 0.83),
+which is the over-gloss cost working. Rejected sides lost to the re-gloss
+rule (108), the definition cap (69), an unsupported number (52), or on
+score alone (120).
+
 **Each round** (`notebooks/05_generate_round_candidates.ipynb` →
 `build_pairs_v3.py` → `notebooks/04_dpo_colab.ipynb` → score): the current
 student writes four briefings per packet; every candidate is scored; the
