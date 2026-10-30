@@ -418,7 +418,7 @@ See [training/README.md](training/README.md).
   evidence accuracy; it gates only on structural checks and regressions.
 - **Small samples.** The headline numbers come from five personas. The
   sixteen generated personas have not had a full scored live run, and the
-  current briefing prompt (v7) postdates the last scored run.
+  current briefing prompt (v8, which adds a final jargon check with worked examples after the trained model kept copying source jargon unexplained) postdates the last scored run.
 - **The specification predates the web app** and still lists a web UI as out
   of scope.
 
