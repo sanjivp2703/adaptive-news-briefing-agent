@@ -434,6 +434,17 @@ which is the over-gloss cost working. Rejected sides lost to the re-gloss
 rule (108), the definition cap (69), an unsupported number (52), or on
 score alone (120).
 
+**Round 3: personas as coaches** (`persona_judge.py`, `notebooks/06_guided_revisions.ipynb`,
+`build_pairs_guided.py`). The student could rewrite a term when told which
+one, but could not spot which terms a reader lacked. So Claude played the
+harness persona matching each training packet's reader (21 personas, word
+lists expanded over each topic's labelled terms, the packet's ledger always
+winning) and flagged the words that persona would not follow, writing no
+text. The student rewrote each flagged draft told which words to fix; 97
+rewrites fixed at least half of them without breaking a rule or dropping
+facts, and became the round-3 pairs. Results and the per-profile chart are
+in the main README under "Stage 3: past the teacher, measured".
+
 **Each round** (`notebooks/05_generate_round_candidates.ipynb` →
 `build_pairs_v3.py` → `notebooks/04_dpo_colab.ipynb` → score): the current
 student writes four briefings per packet; every candidate is scored; the

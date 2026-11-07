@@ -245,6 +245,47 @@ def stage1_definitions_chart() -> str:
                "The untuned base defines far more than the teacher for every profile; the fine-tuned student defines less than the teacher for every profile.")
 
 
+def stage3_persona_chart() -> str:
+    d = DATA["stage3_persona_lost_by_profile"]
+    labels = {"beginner": "Beginner", "partial": "Partway in", "returning_reader": "Returning reader",
+              "expert_one_subdomain": "Expert in one area", "expert": "Expert"}
+    models = [("round 2", "#9cc3ee"), ("round 3", SERIES[0]), ("Claude", SERIES[1])]
+    width, height = 720, 340
+    left, right, top, bottom = 60, 690, 90, 262
+    body = heading(
+        "Words that lost the reader, per briefing, by reader profile",
+        "Claude reads each held-out briefing as the matching persona and lists the words it would not follow. Lower is better.",
+        width,
+    )
+    vmax = 5.0
+    def sy(v): return bottom - v / vmax * (bottom - top)
+    for v in (0, 1, 2, 3, 4, 5):
+        body.append(f'<line x1="{left}" x2="{right}" y1="{sy(v):.1f}" y2="{sy(v):.1f}" stroke="{GRID}"/>')
+        body.append(text(left - 8, sy(v) + 4, str(v), fill=INK2, anchor="end", size=11))
+    group_w = (right - left) / len(labels)
+    bar_w = (group_w - 24) / len(models)
+    for i, (p, label) in enumerate(labels.items()):
+        gx = left + i * group_w + 12
+        for k, (m, color) in enumerate(models):
+            v = d[p][m]
+            x = gx + k * bar_w
+            h = v / vmax * (bottom - top)
+            body.append(f'<rect x="{x:.1f}" y="{bottom - h:.1f}" width="{bar_w - 2:.1f}" height="{h:.1f}" rx="2" fill="{color}"/>')
+            body.append(text(x + (bar_w - 2) / 2, bottom - h - 4, f"{v:.1f}", fill=INK2, anchor="middle", size=9))
+        words = label.split(" ")
+        body.append(text(gx + (group_w - 24) / 2, bottom + 16, " ".join(words[:2]), fill=INK2, anchor="middle", size=10))
+        if len(words) > 2:
+            body.append(text(gx + (group_w - 24) / 2, bottom + 28, " ".join(words[2:]), fill=INK2, anchor="middle", size=10))
+    lx = 60
+    for m, color in models:
+        body.append(f'<rect x="{lx}" y="{top - 26}" width="12" height="7" rx="2" fill="{color}"/>')
+        body.append(text(lx + 18, top - 19, m, fill=INK2, size=10))
+        lx += 24 + 6 * len(m)
+    body.append(text(20, 312, "Round 3 cut confusion for beginners and partway readers. Beginners still lose about four words to Claude's one.", fill=INK2, size=10))
+    return svg(width, height, body, "Words that lost the reader per briefing, by profile: round 2, round 3, Claude",
+               "Round 3 lowers words lost for every profile except returning readers; Claude is lowest for beginners and partway readers, the student is lowest for experts.")
+
+
 def main() -> None:
     out = {
         "ledger-before-after.svg": ledger_before_after_chart(),
@@ -252,6 +293,7 @@ def main() -> None:
         "training-curve.svg": training_curve_chart(),
         "stage1-hard-rules.svg": stage1_rules_chart(),
         "stage1-definitions.svg": stage1_definitions_chart(),
+        "stage3-persona-lost.svg": stage3_persona_chart(),
     }
     for name, content in out.items():
         (HERE / name).write_text(content, encoding="utf-8")

@@ -367,6 +367,60 @@ learning rate was timid. A third pass at a higher rate, or Stage 3's reward
 model, is where that remaining gap gets worked on.
 
 
+### Stage 3: past the teacher, measured
+
+Stage 3 stopped using Claude's text as a target. Claude only judges, or
+labels the source story, and the student learns from its own writing. Five
+attempts, each scored on the same 45 held-out packets:
+
+| | Hard rules | Facts carried | Jargon handled | Unexplained jargon | Overall |
+|---|---|---|---|---|---|
+| Round 1 on the first reward | 45 | 0.85 | 0.43 | | 0.73 |
+| Round 1b, rebuilt reward | 42 | 0.94 | 0.46 | 58 | 0.73 |
+| Round 2, gap-only pairs | 44 | 0.94 | 0.41 | 56 | 0.75 |
+| Round 2 with prompt v8 | 42 | 0.96 | 0.44 | 59 | 0.73 |
+| Round 2, v8, second pass | 42 | 0.92 | 0.46 | 50 | 0.72 |
+| Round 3, persona-guided | 44 | 0.91 | 0.47 | 49 | 0.75 |
+| Claude, measured | 42 | 0.85 | 0.76 | 16 | 0.78 |
+
+"Jargon handled" is the share of the story's central terms that this reader
+lacks and the briefing either explains or replaces with plain words.
+"Unexplained jargon" counts those terms left in unexplained, over the
+beginner, partway and one-area-expert packets.
+
+What each attempt taught:
+
+- **Round 1 gamed its reward.** The first reward measured coverage of the
+  reader's missing terms. A reader who lacks nothing has full coverage
+  whatever the briefing does, so the pairs leaned toward defining less and
+  the model learned to define nothing. The reward was rebuilt around the
+  source story: a once-per-packet Claude label of its central terms and key
+  facts, a hard cap on definitions, and credit for saying a term plainly.
+- **Rounds 1b and 2 learned the story, not the jargon.** Facts carried rose
+  past Claude's. Jargon handling did not move: the model's own candidates
+  almost never explained a term, so best-of-its-own pairs had nothing to
+  teach.
+- **Instructions did not reach it.** A jargon check added to the prompt (v8)
+  changed nothing. A separate short rewrite pass fixed a few terms and
+  dropped some facts.
+- **Round 3 used the personas as coaches.** Claude read the student's
+  training drafts as the harness persona matching each reader and listed the
+  words that persona would not follow. It wrote no text. The student rewrote
+  each draft told which words to fix, and the rewrites that fixed them became
+  the training pairs. This moved jargon more than anything before it.
+
+The personas also scored the held-out briefings directly:
+
+![Words that lost the reader per briefing, by profile: round 2, round 3, Claude](docs/charts/stage3-persona-lost.svg)
+
+The finding: a 3B model trained this way beats Claude at carrying the facts,
+following the rules and not over-explaining to experts, and trails it for
+beginners, who still lose about four words per briefing against Claude's one.
+The limit is the model's ability to spot a word a given reader lacks. Told
+which word, it fixes it only some of the time: only 97 of 290 guided rewrites
+fixed most of the flagged words. More persona-guided rounds should keep
+narrowing the gap; a larger student is the bigger lever.
+
 **Caveats.** The samples are small, the materiality labels are the author's
 own, and no live run has yet passed the harness's ledger gate (precision 0.75
 and recall 0.70 against each persona's real knowledge). These are evidence the
@@ -384,7 +438,7 @@ writer; the yardstick is the same harness.
 | 1 | Supervised fine-tuning of Qwen2.5-3B-Instruct with a LoRA adapter | **Done** 2026-10-13 on a Colab L4. Validation loss 0.87 to 0.69. On the 45 held-out packets, the fine-tuned model passes every hard rule on 40, against 30 for the untuned model and 45 for Claude. Charts below. |
 | Serving | Local model in the briefing seat via an OpenAI-compatible endpoint | **Done** and tested (`LOCAL_MODEL_*` variables) |
 | 2 | DPO on preference pairs ranked by the gate's rules, then a Claude judge | **Two passes run 2026-10-16.** First pass: 44 of 45 on the rules but defined nothing, from a pair set that leaned toward fewer definitions. Second pass on teacher-anchored pairs: 40 of 45 on the rules, definitions back to the teacher's rate for beginners, still none for experts. |
-| 3 | Past the teacher: rejection-sampling DPO against a code-computed reward (hard rules with a definition cap, substance, handling of the terms this reader lacks, fit), Claude only as a judge between student briefings or a labeller of the source story, never as the target. Scored against Claude's briefings and in the live persona harness. | Round 1 first attempt gamed the reward (defined nothing); reward rebuilt, round 1 rerunning; see `training/README.md` |
+| 3 | Past the teacher: rejection-sampling DPO against a code-computed reward (hard rules with a definition cap, substance, handling of the terms this reader lacks, fit), Claude only as a judge between student briefings or a labeller of the source story, never as the target. Scored against Claude's briefings and in the live persona harness. | **Five attempts run 2026-10-17 to 11-06.** Round 3, coached by Claude-played personas, scores 0.75 against Claude's 0.78: ahead on facts, rules and experts, behind for beginners. See [Stage 3, measured](#stage-3-past-the-teacher-measured). |
 
 See [training/README.md](training/README.md).
 
@@ -426,7 +480,7 @@ See [training/README.md](training/README.md).
 
 1. Put the Stage 1 student in the briefing seat for a live harness run and
    score the ledger it produces, not just its briefings.
-2. Stage 3 round 1 on the rebuilt reward, then rounds 2 and 3, then the live persona harness comparison.
+2. More persona-guided rounds or a larger student for the beginner gap, then the live persona harness run with the student in the briefing seat.
 3. A scored live run over all 21 personas on the current prompts, to
    establish a baseline for the gate.
 4. Authentication and hosting. The web app is single-machine, binds to

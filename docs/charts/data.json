@@ -280,5 +280,89 @@
   "eval_reward_margin_first": 1.64,
   "eval_reward_margin_last": 1.83,
   "minutes": 231
+ },
+ "stage3_persona_lost_by_profile": {
+  "_source": "training/persona_judge.py judge on the 45 held-out packets; Claude reads each briefing as the harness persona matching the packet's reader and lists words it would not follow. Mean words per briefing.",
+  "beginner": {
+   "n": 9,
+   "round 2": 4.56,
+   "round 3": 3.89,
+   "Claude": 1.11
+  },
+  "partial": {
+   "n": 10,
+   "round 2": 1.5,
+   "round 3": 1.0,
+   "Claude": 0.4
+  },
+  "returning_reader": {
+   "n": 9,
+   "round 2": 1.44,
+   "round 3": 1.44,
+   "Claude": 1.33
+  },
+  "expert_one_subdomain": {
+   "n": 9,
+   "round 2": 0.67,
+   "round 3": 0.56,
+   "Claude": 0.44
+  },
+  "expert": {
+   "n": 8,
+   "round 2": 1.25,
+   "round 3": 1.12,
+   "Claude": 1.62
+  }
+ },
+ "stage3_rounds": {
+  "_source": "training/compare_vs_claude.py on the 45 held-out packets; stranded = gap terms used without explanation, summed over beginner, partway and one-area-expert readers",
+  "round 1 (gamed)": {
+   "rules": 45,
+   "substance": 0.85,
+   "gap": 0.43,
+   "composite": 0.73
+  },
+  "round 1b": {
+   "rules": 42,
+   "substance": 0.94,
+   "gap": 0.46,
+   "composite": 0.73,
+   "stranded": 58
+  },
+  "round 2": {
+   "rules": 44,
+   "substance": 0.94,
+   "gap": 0.41,
+   "composite": 0.75,
+   "stranded": 56
+  },
+  "round 2, prompt v8": {
+   "rules": 42,
+   "substance": 0.96,
+   "gap": 0.44,
+   "composite": 0.73,
+   "stranded": 59
+  },
+  "round 2, v8 + second pass": {
+   "rules": 42,
+   "substance": 0.92,
+   "gap": 0.46,
+   "composite": 0.72,
+   "stranded": 50
+  },
+  "round 3, persona-guided": {
+   "rules": 44,
+   "substance": 0.91,
+   "gap": 0.47,
+   "composite": 0.75,
+   "stranded": 49
+  },
+  "Claude": {
+   "rules": 42,
+   "substance": 0.85,
+   "gap": 0.76,
+   "composite": 0.78,
+   "stranded": 16
+  }
  }
 }
